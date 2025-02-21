@@ -1,36 +1,33 @@
 package com.xlebo
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
+import CreateTournament
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import fencmaster.composeapp.generated.resources.Res
-import fencmaster.composeapp.generated.resources.compose_multiplatform
+import com.xlebo.navigation.Screen
+import com.xlebo.navigation.SimpleNavController
+import com.xlebo.screens.HomeScreen
+import com.xlebo.screens.Screen3
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
+
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            val navController = remember { SimpleNavController(Screen.Home) }
+            val currentScreen by navController.currentScreen.collectAsState()
+
+            when (currentScreen) {
+                Screen.Home -> HomeScreen(navController = navController)
+                Screen.Screen2 -> CreateTournament(navController = navController)
+                Screen.Screen3 -> Screen3(navController = navController)
             }
         }
     }
