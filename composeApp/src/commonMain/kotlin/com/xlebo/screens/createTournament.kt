@@ -1,35 +1,81 @@
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.xlebo.Platform
+import com.xlebo.modifierUtils.backButton
+import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.navigation.Screen
 import com.xlebo.navigation.SimpleNavController
 
+
 @Composable
 fun CreateTournament(
-    modifier: Modifier = Modifier.fillMaxSize(),
     navController: SimpleNavController,
-){
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    platform: Platform
+) {
+    Column {
+        var tournamentName = remember { "Nový turnaj" }
+        var file: String? by remember { mutableStateOf(null) }
 
-            Text( text = "Screen 2", fontSize = 24.sp  )
+        Text(
+            text = "Nový Turnaj",
+            fontSize = 24.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
 
-            Button(
-                onClick = { navController.navigateTo(Screen.Screen3) }
-            ){ Text("Go To Screen 3") }
+        Spacer(Modifier.padding(20.dp))
 
-            Button(
-                onClick = { navController.navigateBack() }
-            ){ Text("Go Back") }
-
+        Row {
+            Text("Názov Turnaju", modifier = Modifier.padding(10.dp))
+            TextField(
+                value = tournamentName,
+                onValueChange = { tournamentName = it }
+            )
         }
+
+        Row {
+            Button(
+                onClick = {
+                    file = platform.handleFileSelection()
+                }
+            ) {
+                Text("Nahraj ucastnikov")
+            }
+            Text(file?: "No file selected")
+        }
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Button(
+                modifier = Modifier.backButton(),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                onClick = { navController.navigateBack() }
+            ) { Text("Back") }
+
+            Spacer(modifier = Modifier.padding(20.dp))
+
+            Button(
+                modifier = Modifier.defaultButton(),
+                onClick = { navController.navigateTo(Screen.Screen3) }
+            ) { Text("Založiť turnaj") }
+        }
+    }
 }

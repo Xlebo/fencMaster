@@ -24,9 +24,11 @@ fun App() {
             val navController = remember { SimpleNavController(Screen.Home) }
             val currentScreen by navController.currentScreen.collectAsState()
 
+            val platform = getPlatform()
+
             when (currentScreen) {
                 Screen.Home -> HomeScreen(navController = navController)
-                Screen.Screen2 -> CreateTournament(navController = navController)
+                Screen.Screen2 -> CreateTournament(navController = navController, platform = platform)
                 Screen.Screen3 -> Screen3(navController = navController)
             }
         }
