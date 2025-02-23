@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import com.xlebo.navigation.Screen
 import com.xlebo.navigation.SimpleNavController
 import com.xlebo.screens.HomeScreen
-import com.xlebo.screens.Screen3
+import com.xlebo.screens.TournamentDetailScreen
 
 @Composable
 fun App() {
@@ -27,9 +27,9 @@ fun App() {
             val platform = getPlatform()
 
             when (currentScreen) {
-                Screen.Home -> HomeScreen(navController = navController)
-                Screen.Screen2 -> CreateTournament(navController = navController, platform = platform)
-                Screen.Screen3 -> Screen3(navController = navController)
+                is Screen.Home -> HomeScreen(navController = navController)
+                is Screen.Screen2 -> CreateTournament(navController = navController, platform = platform)
+                is Screen.TournamentDetail -> TournamentDetailScreen(navController = navController)
             }
         }
     }

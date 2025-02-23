@@ -22,5 +22,4 @@ class SimpleNavController(initialScreen: Screen) {
             backStack.removeLast()
         }
     }
-
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.xlebo.FilePath
 import com.xlebo.Platform
 import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
@@ -27,11 +28,11 @@ import com.xlebo.navigation.SimpleNavController
 @Composable
 fun CreateTournament(
     navController: SimpleNavController,
-    platform: Platform
+    platform: Platform,
 ) {
     Column {
         var tournamentName = remember { "Nový turnaj" }
-        var file: String? by remember { mutableStateOf(null) }
+        var file: FilePath? by remember { mutableStateOf(null) }
 
         Text(
             text = "Nový Turnaj",
@@ -57,7 +58,7 @@ fun CreateTournament(
             ) {
                 Text("Nahraj ucastnikov")
             }
-            Text(file?: "No file selected")
+            Text(file?.name ?: "No file selected")
         }
 
 
@@ -74,7 +75,7 @@ fun CreateTournament(
 
             Button(
                 modifier = Modifier.defaultButton(),
-                onClick = { navController.navigateTo(Screen.Screen3) }
+                onClick = { navController.navigateTo(Screen.TournamentDetail(file)) }
             ) { Text("Založiť turnaj") }
         }
     }
