@@ -10,17 +10,21 @@ import java.io.File
 class JVMPlatform : Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
 
-    override fun handleFileSelection(): FilePath {
+    override fun handleFileSelection(): FilePath? {
         val dialog = FileDialog(ComposeWindow())
         dialog.file = "*.csv"
         dialog.directory = "C://"
         dialog.isVisible = true
         val filename = dialog.file
-        return FilePath(
-            path = dialog.directory,
-            name = filename
-        ).also {
-            println("Selected: ${it.path} / ${it.name}")
+        return if (filename != null) {
+            FilePath(
+                path = dialog.directory,
+                name = filename
+            ).also {
+                println("Selected: ${it.path} / ${it.name}")
+            }
+        } else {
+            null
         }
     }
 
