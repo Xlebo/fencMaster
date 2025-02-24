@@ -31,7 +31,7 @@ fun CreateTournament(
     platform: Platform,
 ) {
     Column {
-        var tournamentName = remember { "Nový turnaj" }
+        var tournamentName by remember { mutableStateOf("Nový turnaj") }
         var file: FilePath? by remember { mutableStateOf(null) }
 
         Text(
@@ -75,7 +75,17 @@ fun CreateTournament(
 
             Button(
                 modifier = Modifier.defaultButton(),
-                onClick = { navController.navigateTo(Screen.TournamentDetail(file)) }
+                onClick = {
+                    if (file != null) {
+                        navController.navigateTo(
+                            Screen.TournamentDetail(platform.handleParticipantsImport(file!!))
+                        )
+                    } else {
+                        navController.navigateTo(
+                            Screen.TournamentDetail(listOf())
+                        )
+                    }
+                }
             ) { Text("Založiť turnaj") }
         }
     }

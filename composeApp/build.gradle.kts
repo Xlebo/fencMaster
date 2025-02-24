@@ -58,6 +58,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.compose.lazyTable)
             implementation(libs.kotlinx.io)
+            implementation(libs.kcsv)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
