@@ -9,6 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.xlebo.model.Participant
 import com.xlebo.navigation.Screen
 import com.xlebo.navigation.SimpleNavController
 import com.xlebo.screens.HomeScreen
@@ -21,7 +22,24 @@ fun App() {
         Surface(
             modifier = Modifier.fillMaxSize(),
         ) {
-            val navController = remember { SimpleNavController(Screen.Home) }
+//            val navController = remember { SimpleNavController(Screen.Home) }
+            val navController = remember {
+                SimpleNavController(
+                    Screen.TournamentDetail(
+                        listOf(
+                            Participant(
+                                69,
+                                "Meno",
+                                "Priezvisko",
+                                "Mile High Club",
+                                "MAĎAR",
+                                "Ugrofínsky",
+                                420
+                            )
+                        )
+                    )
+                )
+            }
             val currentScreen by navController.currentScreen.collectAsState()
 
             val platform = getPlatform()

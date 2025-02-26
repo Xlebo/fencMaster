@@ -32,7 +32,7 @@ class JVMPlatform : Platform {
         val csv = File(file.path + file.name)
         val headers = Participant.getHeaders()
         return CsvReader(hasHeaderRow = true)
-            .read(csv, Charsets.UTF_8)
+            .read(csv)
             .map { row ->
                 Participant(
                     row[headers[0]].toIntOrNull(),

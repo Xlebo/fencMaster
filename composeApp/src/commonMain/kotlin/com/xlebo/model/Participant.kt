@@ -1,13 +1,13 @@
 package com.xlebo.model
 
 data class Participant(
-    val hrId: Int?,
-    val firstName: String,
-    val lastName: String,
-    val club: String?,
-    val nationality: String?,
-    val lang: String?,
-    val rank: Int?
+    var hrId: Int?,
+    var firstName: String,
+    var lastName: String,
+    var club: String?,
+    var nationality: String?,
+    var lang: String?,
+    var rank: Int?
 ) {
 
     companion object : CsvFile {
