@@ -61,7 +61,19 @@ fun EditableText(text: String) {
             .background(color)
     ) {
         if (editable) {
+            LaunchedEffect(Unit) {
+                startingContent = value
+                focus.requestFocus()
+            }
             BasicTextField(
+                modifier = Modifier.onKeyEvent {
+                    if (it.key == Key.Escape) {
+                        value = startingContent!!
+                        startingContent = null
+                        editable = false
+                    }
+                    true
+                },
                 value = value,
                 onValueChange = {
                     if (it.getOrNull(it.lastIndex)?.isWhitespace() == true &&
@@ -71,20 +83,8 @@ fun EditableText(text: String) {
                     } else {
                         value = it
                     }
-                },
-                modifier = Modifier.onKeyEvent {
-                    if (it.key == Key.Escape) {
-                        value = startingContent!!
-                        startingContent = null
-                        editable = false
-                    }
-                    true
                 }
             )
-            LaunchedEffect(Unit) {
-                startingContent = value
-                focus.requestFocus()
-            }
         } else {
             Text(
                 modifier = Modifier.clickable { editable = true },
