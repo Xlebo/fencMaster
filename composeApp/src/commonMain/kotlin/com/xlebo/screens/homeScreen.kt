@@ -37,7 +37,7 @@ fun HomeScreen(
                 Spacer(Modifier.padding(20.dp))
                 Button(
                     modifier = Modifier.defaultButton().align(Alignment.CenterHorizontally),
-                    onClick = { navController.navigateTo(Screen.Screen2) }
+                    onClick = { navController.navigateTo(Screen.CrateTournament) }
                 ) { Text("Založ Turnaj", fontSize = 15.sp) }
             }
             Divider(modifier = Modifier.fillMaxHeight().width(1.dp))

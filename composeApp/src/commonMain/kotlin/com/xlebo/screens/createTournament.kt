@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +31,7 @@ fun CreateTournament(
     platform: Platform,
 ) {
     Column {
-        var tournamentName = remember { "Nový turnaj" }
+        var tournamentName by remember { mutableStateOf("Nový turnaj") }
         var file: FilePath? by remember { mutableStateOf(null) }
 
         Text(
@@ -44,7 +44,7 @@ fun CreateTournament(
 
         Row {
             Text("Názov Turnaju", modifier = Modifier.padding(10.dp))
-            TextField(
+            OutlinedTextField(
                 value = tournamentName,
                 onValueChange = { tournamentName = it }
             )
@@ -75,7 +75,17 @@ fun CreateTournament(
 
             Button(
                 modifier = Modifier.defaultButton(),
-                onClick = { navController.navigateTo(Screen.TournamentDetail(file)) }
+                onClick = {
+                    if (file != null) {
+                        navController.navigateTo(
+                            Screen.TournamentDetail(platform.handleParticipantsImport(file!!))
+                        )
+                    } else {
+                        navController.navigateTo(
+                            Screen.TournamentDetail(listOf())
+                        )
+                    }
+                }
             ) { Text("Založiť turnaj") }
         }
     }

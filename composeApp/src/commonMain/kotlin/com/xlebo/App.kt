@@ -28,8 +28,18 @@ fun App() {
 
             when (currentScreen) {
                 is Screen.Home -> HomeScreen(navController = navController)
-                is Screen.Screen2 -> CreateTournament(navController = navController, platform = platform)
-                is Screen.TournamentDetail -> TournamentDetailScreen(navController = navController)
+                is Screen.CrateTournament -> CreateTournament(
+                    navController = navController,
+                    platform = platform
+                )
+
+                is Screen.TournamentDetail -> {
+                    val participants = (currentScreen as Screen.TournamentDetail).participants
+                    TournamentDetailScreen(
+                        navController = navController,
+                        participants = participants
+                    )
+                }
             }
         }
     }
