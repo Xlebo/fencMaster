@@ -17,22 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.xlebo.FilePath
+import androidx.navigation.NavHostController
 import com.xlebo.Platform
 import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.navigation.Screen
-import com.xlebo.navigation.SimpleNavController
 
 
 @Composable
 fun CreateTournament(
-    navController: SimpleNavController,
+    navController: NavHostController,
     platform: Platform,
 ) {
     Column {
         var tournamentName by remember { mutableStateOf("Nový turnaj") }
-        var file: FilePath? by remember { mutableStateOf(null) }
+        var file: String? by remember { mutableStateOf(null) }
 
         Text(
             text = "Nový Turnaj",
@@ -58,7 +57,7 @@ fun CreateTournament(
             ) {
                 Text("Nahraj ucastnikov")
             }
-            Text(file?.name ?: "No file selected")
+            Text(file ?: "No file selected")
         }
 
 
@@ -68,7 +67,7 @@ fun CreateTournament(
             Button(
                 modifier = Modifier.backButton(),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                onClick = { navController.navigateBack() }
+                onClick = { navController.currentBackStack.value }
             ) { Text("Back") }
 
             Spacer(modifier = Modifier.padding(20.dp))
@@ -76,15 +75,9 @@ fun CreateTournament(
             Button(
                 modifier = Modifier.defaultButton(),
                 onClick = {
-                    if (file != null) {
-                        navController.navigateTo(
-                            Screen.TournamentDetail(platform.handleParticipantsImport(file!!))
-                        )
-                    } else {
-                        navController.navigateTo(
-                            Screen.TournamentDetail(listOf())
-                        )
-                    }
+                    navController.navigate(
+                        Screen.TournamentDetail(file)
+                    )
                 }
             ) { Text("Založiť turnaj") }
         }

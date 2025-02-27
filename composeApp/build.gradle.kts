@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -59,6 +60,8 @@ kotlin {
             implementation(libs.compose.lazyTable)
             implementation(libs.kotlinx.io)
             implementation(libs.kcsv)
+            implementation(libs.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
 
         }
         desktopMain.dependencies {
@@ -98,6 +101,7 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.foundation.android)
     debugImplementation(compose.uiTooling)
 }
 

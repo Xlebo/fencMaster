@@ -5,9 +5,9 @@ import com.xlebo.model.Participant
 interface Platform {
     val name: String
 
-    fun handleFileSelection(): FilePath?
+    fun handleFileSelection(): String?
 
-    fun handleParticipantsImport(file: FilePath): List<Participant>
+    fun handleParticipantsImport(file: String?): List<Participant>
 }
 
 expect fun getPlatform(): Platform

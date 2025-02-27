@@ -1,9 +1,14 @@
 package com.xlebo.navigation
 
-import com.xlebo.model.Participant
+import kotlinx.serialization.Serializable
 
 sealed interface Screen {
+    @Serializable
     data object Home : Screen
+
+    @Serializable
     data object CrateTournament : Screen
-    data class TournamentDetail(val participants: List<Participant>) : Screen
+
+    @Serializable
+    data class TournamentDetail(val file: String?) : Screen
 }

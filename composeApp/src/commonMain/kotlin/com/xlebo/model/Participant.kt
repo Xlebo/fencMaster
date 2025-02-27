@@ -1,5 +1,8 @@
 package com.xlebo.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Participant(
     var hrId: Int?,
     var firstName: String,

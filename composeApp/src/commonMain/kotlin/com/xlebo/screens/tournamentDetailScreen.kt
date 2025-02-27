@@ -24,12 +24,12 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.xlebo.model.Participant
-import com.xlebo.navigation.SimpleNavController
 
 @Composable
 fun TournamentDetailScreen(
-    navController: SimpleNavController,
+    navController: NavHostController,
     participants: List<Participant>,
 ) {
     LazyColumn {
