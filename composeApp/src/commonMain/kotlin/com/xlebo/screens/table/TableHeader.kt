@@ -3,7 +3,6 @@ package com.xlebo.screens.table
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,17 +20,17 @@ fun TableHeader(values: List<String>, weights: List<Float>) {
             .fillMaxWidth()
             .background(Color.Gray)
         ,
-        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         values.forEachIndexed { index, header ->
             BasicTextField(
                 onValueChange = {},
                 value = header,
                 modifier = Modifier
+                    .weight(weights[index])
                     .border(1.dp, Color.Black)
                     .padding(8.dp)
-                    .fillMaxWidth(weights[index])
-                    .clickable(enabled = false) {},
+                    .clickable(enabled = false) {}
+                ,
                 singleLine = true
             )
         }

@@ -1,8 +1,9 @@
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedTextField
@@ -29,7 +30,10 @@ fun CreateTournament(
     navController: NavHostController,
     platform: Platform,
 ) {
-    Column {
+    Column(
+        modifier = Modifier.padding(15.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
         var tournamentName by remember { mutableStateOf("Nový turnaj") }
         var file: String? by remember { mutableStateOf(null) }
 
@@ -41,7 +45,9 @@ fun CreateTournament(
 
         Spacer(Modifier.padding(20.dp))
 
-        Row {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text("Názov Turnaju", modifier = Modifier.padding(10.dp))
             OutlinedTextField(
                 value = tournamentName,
@@ -49,7 +55,10 @@ fun CreateTournament(
             )
         }
 
-        Row {
+        Row(
+            modifier = Modifier.padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Button(
                 onClick = {
                     file = platform.handleFileSelection()
@@ -57,20 +66,19 @@ fun CreateTournament(
             ) {
                 Text("Nahraj ucastnikov")
             }
+            Spacer(Modifier.width(15.dp))
             Text(file ?: "No file selected")
         }
 
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+        Row {
             Button(
                 modifier = Modifier.backButton(),
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                onClick = { navController.currentBackStack.value }
+                onClick = { navController.popBackStack() }
             ) { Text("Back") }
 
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.weight(1f))
 
             Button(
                 modifier = Modifier.defaultButton(),

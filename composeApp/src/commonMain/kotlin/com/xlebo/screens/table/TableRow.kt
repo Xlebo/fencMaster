@@ -1,7 +1,6 @@
 package com.xlebo.screens.table
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
     var color by remember { mutableStateOf(Color.Cyan) }
 
     Row(
-//        horizontalArrangement = Arrangement.SpaceEvenly,
         modifier = Modifier
             .onFocusChanged {
                 color = if (it.hasFocus) {
@@ -35,12 +33,12 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
             .focusRequester(focus)
     ) {
         val weights = Participant.getWeights()
-        TableCell(participant.hrId?.toString() ?: "nemá", focus, weights[0],true)
-        TableCell(participant.firstName, focus, weights[1])
-        TableCell(participant.lastName, focus, weights[2])
-        TableCell(participant.club ?: "", focus, weights[3])
-        TableCell(participant.nationality ?: "", focus, weights[4])
-        TableCell(participant.lang ?: "", focus, weights[5])
-        TableCell(participant.rank?.toString() ?: "pleb", focus, weights[6], true)
+        TableCell(participant.hrId?.toString() ?: "nemá", focus, Modifier.weight(weights[0]), true)
+        TableCell(participant.firstName, focus, Modifier.weight(weights[1]))
+        TableCell(participant.lastName, focus, Modifier.weight(weights[2]))
+        TableCell(participant.club ?: "", focus, Modifier.weight(weights[3]))
+        TableCell(participant.nationality ?: "", focus, Modifier.weight(weights[4]))
+        TableCell(participant.lang ?: "", focus, Modifier.weight(weights[5]))
+        TableCell(participant.rank?.toString() ?: "pleb", focus, Modifier.weight(weights[6]), true)
     }
 }

@@ -2,6 +2,7 @@ package com.xlebo
 
 import CreateTournament
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -15,7 +16,7 @@ import com.xlebo.screens.HomeScreen
 import com.xlebo.screens.TournamentDetailScreen
 
 @Composable
-fun App() {
+fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null) {
     MaterialTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -35,28 +36,11 @@ fun App() {
                     val detail: Screen.TournamentDetail = it.toRoute()
                     TournamentDetailScreen(
                         navController = navigationController,
-                        participants = platform.handleParticipantsImport(detail.file)
+                        participants = platform.handleParticipantsImport(detail.file),
+                        lazyListScrollBar
                     )
                 }
             }
-//            val navController = remember { SimpleNavController(Screen.Home) }
-//            val navController = remember {
-//                SimpleNavController(
-//                    Screen.TournamentDetail(
-//                        listOf(
-//                            Participant(
-//                                69,
-//                                "Meno",
-//                                "Priezvisko",
-//                                "Mile High Club",
-//                                "MAĎAR",
-//                                "Ugrofínsky",
-//                                420
-//                            )
-//                        )
-//                    )
-//                )
-//            }
         }
     }
 }
