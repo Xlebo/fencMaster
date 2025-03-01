@@ -35,12 +35,13 @@ class JVMPlatform : Platform {
             .read(csv)
             .map { row ->
                 Participant(
-                    row[headers[0]].toIntOrNull(),
-                    row[headers[1]],
+                    row[headers[0]].toInt(),
+                    row[headers[1]].toIntOrNull(),
                     row[headers[2]],
                     row[headers[3]],
                     row[headers[4]],
                     row[headers[5]],
+                    row[headers[6]],
                     null
                 )
             }

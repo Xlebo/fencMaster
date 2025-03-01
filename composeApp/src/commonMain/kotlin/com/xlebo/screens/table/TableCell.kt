@@ -24,7 +24,8 @@ fun TableCell(
     text: String,
     focus: FocusRequester,
     modifier: Modifier,
-    isNumber: Boolean = false
+    isNumber: Boolean = false,
+    enabled: Boolean = true
 ) {
     var value by remember { mutableStateOf(text) }
     var startingValue: String? by remember { mutableStateOf(value) }
@@ -60,6 +61,7 @@ fun TableCell(
             }
             focus.captureFocus()
         },
-        singleLine = true
+        singleLine = true,
+        enabled = enabled
     )
 }

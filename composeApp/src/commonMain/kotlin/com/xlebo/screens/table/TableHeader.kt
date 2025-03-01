@@ -18,7 +18,7 @@ fun TableHeader(values: List<String>, weights: List<Float>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Gray)
+            .background(Color.Yellow)
         ,
     ) {
         values.forEachIndexed { index, header ->
