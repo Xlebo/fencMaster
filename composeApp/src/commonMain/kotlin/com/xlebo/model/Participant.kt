@@ -11,7 +11,8 @@ data class Participant(
     var club: String?,
     var nationality: String?,
     var lang: String?,
-    var rank: Int?
+    var rank: Int?,
+    var disabled: Boolean = false
 ) {
 
     companion object : TableValue {
