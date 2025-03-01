@@ -24,7 +24,7 @@ fun App() {
             val navigationController = rememberNavController()
             NavHost(
                 navController = navigationController,
-                startDestination = Screen.Home
+                startDestination = Screen.Home,
             ) {
                 composable<Screen.Home> { HomeScreen(navController = navigationController) }
                 composable<Screen.CrateTournament> { CreateTournament(

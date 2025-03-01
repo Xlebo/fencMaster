@@ -13,7 +13,7 @@ data class Participant(
     var rank: Int?
 ) {
 
-    companion object : CsvFile {
+    companion object : TableValue {
         override fun getHeaders(): List<String> {
             return listOf(
                 "HR ID",
@@ -24,6 +24,12 @@ data class Participant(
                 "Jazyk",
                 "HR Rank"
             )
+        }
+
+        override fun getWeights(): List<Float> {
+            val weights = listOf(.1f, .1f, .2f, .2f, .1f, .2f, .1f)
+            check(weights.size == getHeaders().size) { "nech mi nejebe" }
+            return weights
         }
     }
 }
