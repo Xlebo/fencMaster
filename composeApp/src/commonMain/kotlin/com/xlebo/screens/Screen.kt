@@ -1,4 +1,4 @@
-package com.xlebo.navigation
+package com.xlebo.screens
 
 import kotlinx.serialization.Serializable
 
@@ -10,5 +10,5 @@ sealed interface Screen {
     data object CrateTournament : Screen
 
     @Serializable
-    data class TournamentDetail(val file: String?) : Screen
+    data class TournamentDetail(val name: String, val file: String?) : Screen
 }

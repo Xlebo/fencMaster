@@ -1,5 +1,4 @@
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,7 @@ import androidx.navigation.NavHostController
 import com.xlebo.Platform
 import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
-import com.xlebo.navigation.Screen
+import com.xlebo.screens.Screen
 
 
 @Composable
@@ -42,7 +41,6 @@ fun CreateTournament(
             fontSize = 24.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-
         Spacer(Modifier.padding(20.dp))
 
         Row(
@@ -84,7 +82,7 @@ fun CreateTournament(
                 modifier = Modifier.defaultButton(),
                 onClick = {
                     navController.navigate(
-                        Screen.TournamentDetail(file)
+                        Screen.TournamentDetail(tournamentName, file)
                     )
                 }
             ) { Text("Založiť turnaj") }

@@ -11,7 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.xlebo.navigation.Screen
+import com.xlebo.screens.Screen
 import com.xlebo.screens.HomeScreen
 import com.xlebo.screens.TournamentDetailScreen
 
@@ -36,6 +36,7 @@ fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = nu
                     val detail: Screen.TournamentDetail = it.toRoute()
                     TournamentDetailScreen(
                         navController = navigationController,
+                        name = detail.name,
                         participants = platform.handleParticipantsImport(detail.file),
                         lazyListScrollBar
                     )
