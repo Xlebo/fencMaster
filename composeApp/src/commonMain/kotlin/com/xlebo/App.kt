@@ -10,36 +10,60 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.xlebo.screens.Screen
+import androidx.navigation.navigation
 import com.xlebo.screens.HomeScreen
+import com.xlebo.screens.NestedNavigation
+import com.xlebo.screens.Screen
 import com.xlebo.screens.TournamentDetailScreen
+import com.xlebo.viewModel.SharedViewModel
+import org.koin.compose.KoinApplication
 
 @Composable
 fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null) {
-    MaterialTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            val platform = getPlatform()
-            val navigationController = rememberNavController()
-            NavHost(
-                navController = navigationController,
-                startDestination = Screen.Home,
+    KoinApplication(
+        application = {
+            modules(
+//                module {
+//                    single { SharedViewModel() }
+//                }
+            )
+        }
+    ) {
+        MaterialTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
             ) {
-                composable<Screen.Home> { HomeScreen(navController = navigationController) }
-                composable<Screen.CrateTournament> { CreateTournament(
+                val platform = getPlatform()
+                val navigationController = rememberNavController()
+                NavHost(
                     navController = navigationController,
-                    platform = platform
-                ) }
-                composable<Screen.TournamentDetail> {
-                    val detail: Screen.TournamentDetail = it.toRoute()
-                    TournamentDetailScreen(
-                        navController = navigationController,
-                        name = detail.name,
-                        participants = platform.handleParticipantsImport(detail.file),
-                        lazyListScrollBar
-                    )
+                    startDestination = Screen.Home,
+                ) {
+                    composable<Screen.Home> {
+                        HomeScreen(navController = navigationController)
+                    }
+
+                    navigation<NestedNavigation.CreateTournament>(
+                        startDestination = Screen.CreateTournament
+                    ) {
+                        val viewModel = SharedViewModel()
+                        composable<Screen.CreateTournament> {
+                            CreateTournament(
+                                navController = navigationController,
+                                platform = platform,
+//                                koinViewModel<SharedViewModel>()
+                                viewModel
+                            )
+                        }
+                        composable<Screen.TournamentDetail> {
+                            TournamentDetailScreen(
+                                navController = navigationController,
+                                lazyListScrollBar,
+//                                koinViewModel<SharedViewModel>()
+                                viewModel
+                            )
+                        }
+                    }
                 }
             }
         }

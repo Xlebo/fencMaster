@@ -18,6 +18,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,27 +29,30 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.xlebo.model.Participant
 import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.screens.dialog.NotImplementedDialog
+import com.xlebo.screens.table.NewParticipantTableRow
 import com.xlebo.screens.table.TableHeader
 import com.xlebo.screens.table.TableRow
+import com.xlebo.viewModel.SharedViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TournamentDetailScreen(
     navController: NavHostController,
-    name: String,
-    participants: List<Participant>,
-    lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null
+    lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null,
+    viewModel: SharedViewModel = koinViewModel()
 ) {
     var notImplementedDialog by remember { mutableStateOf(false) }
     val focus = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
-
+    val uiState by viewModel.uiState.collectAsState()
 
     if (notImplementedDialog) {
         NotImplementedDialog { notImplementedDialog = false }
@@ -64,7 +68,7 @@ fun TournamentDetailScreen(
                         horizontalArrangement = Arrangement.Center,
                     ) {
                         Text(
-                            text = name,
+                            text = uiState.name,
                             fontSize = 24.sp
                         )
                     }
@@ -75,8 +79,18 @@ fun TournamentDetailScreen(
                     TableHeader(Participant.getHeaders(), Participant.getWeights())
                 }
 
-                items(participants) { participant ->
+                items(uiState.participants, key = { item -> item.order }) { participant ->
                     TableRow(participant, focus)
+                }
+
+                item {
+                    NewParticipantTableRow(
+                        Participant.getWeights(),
+                        uiState.participants.size + 1,
+                        focus
+                    ) { participant ->
+                        viewModel.addParticipant(participant)
+                    }
                 }
 
                 item {

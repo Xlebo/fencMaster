@@ -63,6 +63,9 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             runtimeOnly(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -102,6 +105,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
     debugImplementation(compose.uiTooling)
 }
 

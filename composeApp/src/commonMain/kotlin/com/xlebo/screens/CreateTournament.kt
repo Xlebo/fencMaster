@@ -8,6 +8,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,25 +18,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.xlebo.Platform
 import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.screens.Screen
+import com.xlebo.viewModel.SharedViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun CreateTournament(
     navController: NavHostController,
     platform: Platform,
+    viewModel: SharedViewModel = koinViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier.padding(15.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        var tournamentName by remember { mutableStateOf("Nový turnaj") }
-        var file: String? by remember { mutableStateOf(null) }
-
         Text(
             text = "Nový Turnaj",
             fontSize = 24.sp,
@@ -48,8 +52,8 @@ fun CreateTournament(
         ) {
             Text("Názov Turnaju", modifier = Modifier.padding(10.dp))
             OutlinedTextField(
-                value = tournamentName,
-                onValueChange = { tournamentName = it }
+                value = uiState.name,
+                onValueChange = { viewModel.setName(it) }
             )
         }
 
@@ -59,13 +63,15 @@ fun CreateTournament(
         ) {
             Button(
                 onClick = {
-                    file = platform.handleFileSelection()
+                    val path = platform.handleFileSelection()
+                    viewModel.setParticipants(platform.handleParticipantsImport(path))
+                    viewModel.setFilePath(path)
                 }
             ) {
                 Text("Nahraj ucastnikov")
             }
             Spacer(Modifier.width(15.dp))
-            Text(file ?: "No file selected")
+            Text(uiState.filePath ?: "No file selected")
         }
 
 
@@ -82,7 +88,7 @@ fun CreateTournament(
                 modifier = Modifier.defaultButton(),
                 onClick = {
                     navController.navigate(
-                        Screen.TournamentDetail(tournamentName, file)
+                        Screen.TournamentDetail
                     )
                 }
             ) { Text("Založiť turnaj") }
