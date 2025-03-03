@@ -26,7 +26,6 @@ import com.xlebo.model.Participant
 fun NewParticipantTableRow(
     weights: List<Float>,
     order: Int,
-    focus: FocusRequester,
     onAdd: (Participant) -> Unit
 ) {
     val hrId by remember { mutableStateOf("") }
@@ -47,16 +46,16 @@ fun NewParticipantTableRow(
     Row(
         modifier = Modifier.background(Color.Green)
     ) {
-        TableCell(order.toString(), focus, Modifier.weight(weights[0]), enabled = false)
-        TableCell(hrId, focus, Modifier.weight(weights[1]))
-        TableCell(firstName, focus, Modifier.weight(weights[2]))
-        TableCell(lastName, focus, Modifier.weight(weights[3]))
-        TableCell(club, focus, Modifier.weight(weights[4]))
-        TableCell(nationality, focus, Modifier.weight(weights[5]))
-        TableCell(lang, focus, Modifier.weight(weights[6]))
-        TableCell(rank, focus, Modifier.weight(weights[7]))
+        TableCell(order.toString(), Modifier.weight(weights[0]), enabled = false)
+        TableCell(hrId, Modifier.weight(weights[1]))
+        TableCell(firstName, Modifier.weight(weights[2]))
+        TableCell(lastName, Modifier.weight(weights[3]))
+        TableCell(club, Modifier.weight(weights[4]))
+        TableCell(nationality, Modifier.weight(weights[5]))
+        TableCell(lang, Modifier.weight(weights[6]))
+        TableCell(rank, Modifier.weight(weights[7]))
         OutlinedButton(
-            modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusRequester(focus),
+            modifier = Modifier.size(25.dp).align(Alignment.CenterVertically),
             onClick = {
 //                if (checkFields())
                     onAdd(Participant(order, hrId.toIntOrNull(), firstName, lastName, club, nationality, lang, rank.toIntOrNull()))

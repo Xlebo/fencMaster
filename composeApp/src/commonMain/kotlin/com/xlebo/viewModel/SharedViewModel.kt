@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SharedUiState(
-    val name: String = "Nový Turnaj",
+    val name: String = "Nový turnaj",
     val filePath: String? = null,
     val participants: List<Participant> = listOf()
 )
@@ -18,11 +18,12 @@ class SharedViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(SharedUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        println("Created new instance of shared view model with $uiState")
+    fun reset() {
+        _uiState.update { SharedUiState() }
     }
 
     fun setParticipants(participants: List<Participant>) {
+        println("Setting participants: $participants")
         _uiState.update { current -> current.copy(participants = participants) }
     }
 

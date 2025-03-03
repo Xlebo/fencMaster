@@ -50,7 +50,6 @@ fun TournamentDetailScreen(
     viewModel: SharedViewModel = koinViewModel()
 ) {
     var notImplementedDialog by remember { mutableStateOf(false) }
-    val focus = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -80,14 +79,13 @@ fun TournamentDetailScreen(
                 }
 
                 items(uiState.participants, key = { item -> item.order }) { participant ->
-                    TableRow(participant, focus)
+                    TableRow(participant)
                 }
 
                 item {
                     NewParticipantTableRow(
                         Participant.getWeights(),
                         uiState.participants.size + 1,
-                        focus
                     ) { participant ->
                         viewModel.addParticipant(participant)
                     }

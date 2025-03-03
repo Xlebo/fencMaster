@@ -50,7 +50,7 @@ fun CreateTournament(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Názov Turnaju", modifier = Modifier.padding(10.dp))
+            Text("Názov Turnaja", modifier = Modifier.padding(10.dp))
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = { viewModel.setName(it) }

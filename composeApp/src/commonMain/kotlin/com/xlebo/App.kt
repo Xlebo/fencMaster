@@ -17,15 +17,22 @@ import com.xlebo.screens.Screen
 import com.xlebo.screens.TournamentDetailScreen
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.KoinApplication
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.dsl.module
+
+/*
+TODO list:
+- use viewmodel when updating entities in table
+ */
 
 @Composable
 fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null) {
     KoinApplication(
         application = {
             modules(
-//                module {
-//                    single { SharedViewModel() }
-//                }
+                module {
+                    single { SharedViewModel() }
+                }
             )
         }
     ) {
@@ -51,16 +58,16 @@ fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = nu
                             CreateTournament(
                                 navController = navigationController,
                                 platform = platform,
-//                                koinViewModel<SharedViewModel>()
-                                viewModel
+                                koinViewModel<SharedViewModel>()
+//                                viewModel
                             )
                         }
                         composable<Screen.TournamentDetail> {
                             TournamentDetailScreen(
                                 navController = navigationController,
                                 lazyListScrollBar,
-//                                koinViewModel<SharedViewModel>()
-                                viewModel
+                                koinViewModel<SharedViewModel>()
+//                                viewModel
                             )
                         }
                     }

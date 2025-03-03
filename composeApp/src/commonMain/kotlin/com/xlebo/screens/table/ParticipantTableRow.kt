@@ -1,6 +1,7 @@
 package com.xlebo.screens.table
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,8 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
@@ -28,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
 
 @Composable
-fun TableRow(participant: Participant, focus: FocusRequester) {
+fun TableRow(participant: Participant) {
     val defaultColor = if (participant.disabled) {
         Color.Red
     } else {
@@ -56,53 +55,45 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
             }
             .fillMaxWidth()
             .background(color)
-            .focusRequester(focus)
     ) {
         val weights = Participant.getWeights()
 
         TableCell(
             participant.order.toString(),
-            focus,
             Modifier.weight(weights[0]).background(Color.Gray),
             enabled = false
         )
         TableCell(
-            participant.hrId?.toString() ?: "nemá", focus, Modifier.weight(weights[1]), true,
+            participant.hrId?.toString() ?: "nemá", Modifier.weight(weights[1]), true,
             enabled = !participant.disabled
         )
         TableCell(
             participant.firstName,
-            focus,
             Modifier.weight(weights[2]),
             enabled = !participant.disabled
         )
         TableCell(
             participant.lastName,
-            focus,
             Modifier.weight(weights[3]),
             enabled = !participant.disabled
         )
         TableCell(
             participant.club ?: "",
-            focus,
             Modifier.weight(weights[4]),
             enabled = !participant.disabled
         )
         TableCell(
             participant.nationality ?: "",
-            focus,
             Modifier.weight(weights[5]),
             enabled = !participant.disabled
         )
         TableCell(
             participant.lang ?: "",
-            focus,
             Modifier.weight(weights[6]),
             enabled = !participant.disabled
         )
         TableCell(
             participant.rank?.toString() ?: "pleb",
-            focus,
             Modifier.weight(weights[7]),
             true,
             enabled = !participant.disabled
@@ -110,15 +101,13 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
 
         if (participant.disabled) {
             OutlinedButton(
-                modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusRequester(focus),
+                modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusable(false),
                 onClick = {
                     participant.disabled = false
-                    focusManager.clearFocus()
                 },
                 shape = CircleShape,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Green),
                 contentPadding = PaddingValues(0.dp),
-
                 ) {
                 Icon(
                     Icons.Default.Add,
@@ -128,7 +117,7 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
             }
         } else {
             OutlinedButton(
-                modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusRequester(focus),
+                modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusable(false),
                 onClick = {
                     participant.disabled = true
                     focusManager.clearFocus()
@@ -136,7 +125,6 @@ fun TableRow(participant: Participant, focus: FocusRequester) {
                 shape = CircleShape,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                 contentPadding = PaddingValues(0.dp),
-
                 ) {
                 Icon(
                     Icons.Default.Close,
