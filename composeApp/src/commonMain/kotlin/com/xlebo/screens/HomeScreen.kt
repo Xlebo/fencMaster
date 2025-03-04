@@ -15,13 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.xlebo.modifierUtils.defaultButton
-import com.xlebo.navigation.Screen
-import com.xlebo.navigation.SimpleNavController
 
 @Composable
 fun HomeScreen(
-    navController: SimpleNavController,
+    navController: NavHostController,
 ) {
     Column {
         Text(
@@ -37,7 +36,7 @@ fun HomeScreen(
                 Spacer(Modifier.padding(20.dp))
                 Button(
                     modifier = Modifier.defaultButton().align(Alignment.CenterHorizontally),
-                    onClick = { navController.navigateTo(Screen.CrateTournament) }
+                    onClick = { navController.navigate(NestedNavigation.CreateTournament) }
                 ) { Text("Založ Turnaj", fontSize = 15.sp) }
             }
             Divider(modifier = Modifier.fillMaxHeight().width(1.dp))

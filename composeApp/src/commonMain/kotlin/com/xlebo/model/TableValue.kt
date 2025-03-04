@@ -1,6 +1,8 @@
 package com.xlebo.model
 
-interface CsvFile {
+interface TableValue {
 
     fun getHeaders(): List<String>
+
+    fun getWeights(): List<Float>
 }

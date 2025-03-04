@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -17,9 +18,9 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     jvm("desktop")
-    
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -39,10 +40,10 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         val desktopMain by getting
-        
+
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
@@ -54,16 +55,21 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.jetbrains.lifecycle.viewmodel.compose)
             implementation(libs.compose.lazyTable)
             implementation(libs.kotlinx.io)
             implementation(libs.kcsv)
-
+            implementation(libs.navigation.compose)
+            implementation(libs.kotlinx.serialization.json)
+            runtimeOnly(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
+            implementation(libs.koin.compose.viewmodel.navigation)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
+            runtimeOnly(libs.kotlinx.coroutines.swing)
         }
     }
 }
@@ -98,6 +104,8 @@ android {
 dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.foundation.android)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
     debugImplementation(compose.uiTooling)
 }
 
