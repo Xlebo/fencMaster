@@ -118,7 +118,12 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "fencmaster"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.2"
+            windows {
+                iconFile.set(project.file("mec.ico"))
+                shortcut = true
+                menu = true
+            }
         }
     }
 }
