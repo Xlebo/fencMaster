@@ -25,11 +25,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.xlebo.model.Participant
 import com.xlebo.modifierUtils.backButton
@@ -37,7 +35,7 @@ import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.screens.dialog.NotImplementedDialog
 import com.xlebo.screens.table.NewParticipantTableRow
 import com.xlebo.screens.table.TableHeader
-import com.xlebo.screens.table.TableRow
+import com.xlebo.screens.table.ParticipantTableRow
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -47,10 +45,10 @@ import org.koin.compose.viewmodel.koinViewModel
 fun TournamentDetailScreen(
     navController: NavHostController,
     lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null,
-    viewModel: SharedViewModel = koinViewModel()
 ) {
     var notImplementedDialog by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
+    val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     if (notImplementedDialog) {
@@ -79,7 +77,7 @@ fun TournamentDetailScreen(
                 }
 
                 items(uiState.participants, key = { item -> item.order }) { participant ->
-                    TableRow(participant)
+                    ParticipantTableRow(participant)
                 }
 
                 item {

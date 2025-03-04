@@ -14,10 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
@@ -28,13 +27,13 @@ fun NewParticipantTableRow(
     order: Int,
     onAdd: (Participant) -> Unit
 ) {
-    val hrId by remember { mutableStateOf("") }
-    val firstName by remember { mutableStateOf("") }
-    val lastName by remember { mutableStateOf("") }
-    val club by remember { mutableStateOf("") }
-    val nationality by remember { mutableStateOf("") }
-    val lang by remember { mutableStateOf("") }
-    val rank by remember { mutableStateOf("") }
+    var hrId by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var club by remember { mutableStateOf("") }
+    var nationality by remember { mutableStateOf("") }
+    var lang by remember { mutableStateOf("") }
+    var rank by remember { mutableStateOf("") }
 
     fun checkFields(): Boolean {
         return firstName.isNotEmpty() &&
@@ -46,18 +45,18 @@ fun NewParticipantTableRow(
     Row(
         modifier = Modifier.background(Color.Green)
     ) {
-        TableCell(order.toString(), Modifier.weight(weights[0]), enabled = false)
-        TableCell(hrId, Modifier.weight(weights[1]))
-        TableCell(firstName, Modifier.weight(weights[2]))
-        TableCell(lastName, Modifier.weight(weights[3]))
-        TableCell(club, Modifier.weight(weights[4]))
-        TableCell(nationality, Modifier.weight(weights[5]))
-        TableCell(lang, Modifier.weight(weights[6]))
-        TableCell(rank, Modifier.weight(weights[7]))
+        TableCell(order.toString(), Modifier.weight(weights[0]), enabled = false) {}
+        TableCell(hrId, Modifier.weight(weights[1]), isNumber = true) { hrId = it }
+        TableCell(firstName, Modifier.weight(weights[2])) { firstName = it}
+        TableCell(lastName, Modifier.weight(weights[3])) { lastName = it }
+        TableCell(club, Modifier.weight(weights[4])) { club = it }
+        TableCell(nationality, Modifier.weight(weights[5])) { nationality = it }
+        TableCell(lang, Modifier.weight(weights[6])) { lang = it }
+        TableCell(rank, Modifier.weight(weights[7]), isNumber = true) { rank = it }
         OutlinedButton(
             modifier = Modifier.size(25.dp).align(Alignment.CenterVertically),
             onClick = {
-//                if (checkFields())
+                if (checkFields())
                     onAdd(Participant(order, hrId.toIntOrNull(), firstName, lastName, club, nationality, lang, rank.toIntOrNull()))
             },
             shape = CircleShape,

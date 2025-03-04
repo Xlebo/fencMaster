@@ -5,16 +5,15 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Participant(
     val order: Int,
-    var hrId: Int?,
-    var firstName: String,
-    var lastName: String,
-    var club: String?,
-    var nationality: String?,
-    var lang: String?,
-    var rank: Int?,
-    var disabled: Boolean = false
+    val hrId: Int?,
+    val firstName: String,
+    val lastName: String,
+    val club: String?,
+    val nationality: String?,
+    val lang: String?,
+    val rank: Int?,
+    val disabled: Boolean = false
 ) {
-
     companion object : TableValue {
         override fun getHeaders(): List<String> {
             return listOf(

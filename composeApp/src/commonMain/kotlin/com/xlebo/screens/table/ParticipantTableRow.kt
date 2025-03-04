@@ -25,9 +25,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
+import com.xlebo.viewModel.SharedViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun TableRow(participant: Participant) {
+fun ParticipantTableRow(participant: Participant) {
+    val viewModel: SharedViewModel = koinViewModel()
     val defaultColor = if (participant.disabled) {
         Color.Red
     } else {
@@ -62,48 +65,48 @@ fun TableRow(participant: Participant) {
             participant.order.toString(),
             Modifier.weight(weights[0]).background(Color.Gray),
             enabled = false
-        )
+        ) {}
         TableCell(
-            participant.hrId?.toString() ?: "nemá", Modifier.weight(weights[1]), true,
+            participant.hrId?.toString() ?: "", Modifier.weight(weights[1]), true,
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(hrId = new.toIntOrNull())) }
         TableCell(
             participant.firstName,
             Modifier.weight(weights[2]),
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(firstName = new)) }
         TableCell(
             participant.lastName,
             Modifier.weight(weights[3]),
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(lastName = new)) }
         TableCell(
             participant.club ?: "",
             Modifier.weight(weights[4]),
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(club = new)) }
         TableCell(
             participant.nationality ?: "",
             Modifier.weight(weights[5]),
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(nationality = new)) }
         TableCell(
             participant.lang ?: "",
             Modifier.weight(weights[6]),
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(lang = new)) }
         TableCell(
-            participant.rank?.toString() ?: "pleb",
+            participant.rank?.toString() ?: "",
             Modifier.weight(weights[7]),
             true,
             enabled = !participant.disabled
-        )
+        ) { new -> viewModel.updateParticipant(participant.copy(rank = new.toIntOrNull())) }
 
         if (participant.disabled) {
             OutlinedButton(
                 modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusable(false),
                 onClick = {
-                    participant.disabled = false
+                    viewModel.updateParticipant(participant.copy(disabled = false))
                 },
                 shape = CircleShape,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Green),
@@ -119,7 +122,7 @@ fun TableRow(participant: Participant) {
             OutlinedButton(
                 modifier = Modifier.size(25.dp).align(Alignment.CenterVertically).focusable(false),
                 onClick = {
-                    participant.disabled = true
+                    viewModel.updateParticipant(participant.copy(disabled = true))
                     focusManager.clearFocus()
                 },
                 shape = CircleShape,

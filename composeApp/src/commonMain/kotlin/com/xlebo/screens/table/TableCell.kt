@@ -24,26 +24,26 @@ fun TableCell(
     text: String,
     modifier: Modifier,
     isNumber: Boolean = false,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    updateField: (String) -> Unit
 ) {
-    var value by remember { mutableStateOf(text) }
-    var startingValue: String? by remember { mutableStateOf(value) }
+    var startingValue: String by remember { mutableStateOf(text) }
     val focusManager = LocalFocusManager.current
 
     BasicTextField(modifier = modifier.focusable(enabled)
         .onKeyEvent {
             if (it.key == Key.Escape) {
-                value = startingValue!!
+                updateField(startingValue)
                 focusManager.clearFocus()
             }
             if (it.key == Key.Enter) {
-                value = value.trim()
-                startingValue = value
+                updateField(text.trim())
+                startingValue = text.trim()
                 focusManager.clearFocus()
             }
             if (it.key == Key.Tab) {
-                value = value.trim()
-                startingValue = value
+                updateField(text.trim())
+                startingValue = text.trim()
                 if (it.isShiftPressed) {
                     focusManager.moveFocus(FocusDirection.Previous)
                 } else {
@@ -54,15 +54,15 @@ fun TableCell(
         }
         .border(1.dp, Color.Black)
         .padding(8.dp),
-        value = value,
+        value = text,
         onValueChange = {
             if (isNumber) {
                 val num = it.toIntOrNull()
                 if (num != null || it.isEmpty()) {
-                    value = it
+                    updateField(it)
                 }
             } else {
-                value = it
+                updateField(it)
             }
         },
         singleLine = true,

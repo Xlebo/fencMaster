@@ -39,4 +39,10 @@ class SharedViewModel : ViewModel() {
     fun setFilePath(path: String?) {
         _uiState.update { current -> current.copy(filePath = path) }
     }
+
+    fun updateParticipant(participant: Participant) {
+        val newList = _uiState.value.participants.toMutableList()
+        newList[participant.order - 1] = participant
+        _uiState.update { current -> current.copy(participants = newList) }
+    }
 }
