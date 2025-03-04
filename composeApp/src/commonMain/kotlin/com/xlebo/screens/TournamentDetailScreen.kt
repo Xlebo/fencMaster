@@ -34,8 +34,8 @@ import com.xlebo.modifierUtils.backButton
 import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.screens.dialog.NotImplementedDialog
 import com.xlebo.screens.table.NewParticipantTableRow
-import com.xlebo.screens.table.TableHeader
 import com.xlebo.screens.table.ParticipantTableRow
+import com.xlebo.screens.table.TableHeader
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 

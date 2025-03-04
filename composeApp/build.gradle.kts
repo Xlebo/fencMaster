@@ -68,7 +68,9 @@ kotlin {
             implementation(libs.koin.compose.viewmodel.navigation)
         }
         desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.windows_x64)
+//            implementation(compose.desktop.macos_x64)
+//            implementation(compose.desktop.linux_x64)
             runtimeOnly(libs.kotlinx.coroutines.swing)
         }
     }
@@ -114,8 +116,8 @@ compose.desktop {
         mainClass = "com.xlebo.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.xlebo"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            packageName = "fencmaster"
             packageVersion = "1.0.0"
         }
     }
