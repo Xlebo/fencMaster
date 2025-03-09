@@ -2,6 +2,7 @@ package com.xlebo
 
 import androidx.compose.ui.awt.ComposeWindow
 import com.xlebo.model.Participant
+import io.github.aakira.napier.Napier
 import net.codinux.csv.reader.CsvReader
 import net.codinux.csv.reader.read
 import java.awt.FileDialog
@@ -21,7 +22,7 @@ class JVMPlatform : Platform {
         } else {
             null
         }.also {
-            println("Selected: $it")
+            Napier.d("Selected csv: $it")
         }
     }
 

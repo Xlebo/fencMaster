@@ -23,7 +23,6 @@ fun main() = application {
         title = "FencMaster",
         icon = painterResource(Res.drawable.mec)
     ) {
-//        println(System.getProperty("user.home"))
 
         App(hemaRatingClient = remember {
             HemaRatingClient(createHttpClient(OkHttp.create()), System.getenv("hr.apikey"))

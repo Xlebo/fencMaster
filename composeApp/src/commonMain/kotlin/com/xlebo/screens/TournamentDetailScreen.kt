@@ -51,6 +51,8 @@ fun TournamentDetailScreen(
     val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
+    viewModel.wakeUpHemaRatings()
+
     if (notImplementedDialog) {
         NotImplementedDialog { notImplementedDialog = false }
     } else {

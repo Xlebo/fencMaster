@@ -6,6 +6,7 @@ import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.accept
+import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -17,7 +18,8 @@ import io.ktor.http.path
 class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: String) {
 
     init {
-        println("HemaRatingClient initialized, apikey: $apiKey")
+        if (apiKey.isEmpty())
+            Napier.w("HemaRatingClient initialized without API key")
     }
 
     // TODO: Make some notification on exception, or progress bar
@@ -30,10 +32,7 @@ class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: S
         }
         try {
             val body = participants
-                .filter { it.hrId != null } // remove later if better decision mechanism is given
                 .map { it.firstName + ' ' + it.lastName }
-            println("Fetching ratings for fellas: ")
-            body.forEach { println(it) }
             val response: List<FighterResponseDto> = httpClient.post(Constants.HEMARATINGS_API) {
                 url {
                     protocol = URLProtocol.HTTPS
@@ -44,13 +43,10 @@ class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: S
                 contentType(ContentType.Application.Json)
                 accept(ContentType.Application.Json)
                 headers {
-//                append("x-functions-key", apiKey)
+                    append("x-functions-key", apiKey)
                 }
                 setBody(body)
             }.body()
-
-            println("Got responses: ")
-            response.forEach { println(it) }
 
             return participants.mapIndexed { index, participant ->
                 if (participant.hrId == null) {
@@ -70,6 +66,20 @@ class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: S
         } catch (e: Exception) {
             Napier.w { e.stackTraceToString() }
             return listOf()
+        }
+    }
+
+    suspend fun wakeUp() {
+        Napier.i { "Waking up Hema Ratings"}
+        httpClient.get(Constants.HEMARATINGS_API) {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = Constants.HEMARATINGS_API
+                path("wakeup")
+            }
+            headers {
+                append("x-functions-key", apiKey)
+            }
         }
     }
 }

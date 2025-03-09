@@ -21,7 +21,7 @@ data class SharedUiState(
     val highRank: Int = 500
 )
 
-class SharedViewModel(val hemaRating: HemaRatingClient, val coroutineScope: CoroutineScope) : ViewModel() {
+class SharedViewModel(private val hemaRating: HemaRatingClient, private val coroutineScope: CoroutineScope) : ViewModel() {
     private val _uiState = MutableStateFlow(SharedUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -30,7 +30,6 @@ class SharedViewModel(val hemaRating: HemaRatingClient, val coroutineScope: Coro
     }
 
     fun setParticipants(participants: List<Participant>) {
-        println("Setting participants: $participants")
         _uiState.update { current -> current.copy(participants = participants) }
     }
 
@@ -63,5 +62,9 @@ class SharedViewModel(val hemaRating: HemaRatingClient, val coroutineScope: Coro
                 ranks.forEach { updated -> updateParticipant(updated) }
             }
         }
+    }
+
+    fun wakeUpHemaRatings() {
+        coroutineScope.launch { hemaRating.wakeUp() }
     }
 }
