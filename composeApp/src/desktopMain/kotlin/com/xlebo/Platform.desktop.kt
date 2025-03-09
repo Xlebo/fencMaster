@@ -33,15 +33,15 @@ class JVMPlatform : Platform {
         val headers = Participant.getHeaders()
         return CsvReader(hasHeaderRow = true)
             .read(csv)
-            .map { row ->
+            .mapIndexed { index, row ->
                 Participant(
-                    row[headers[0]].toInt(),
-                    row[headers[1]].toIntOrNull(),
-                    row[headers[2]],
-                    row[headers[3]],
-                    row[headers[4]],
-                    row[headers[5]],
-                    row[headers[6]],
+                    index + 1,
+                    row[headers[1]].trim().toIntOrNull(),
+                    row[headers[2]].trim(),
+                    row[headers[3]].trim(),
+                    row[headers[4]].trim(),
+                    row[headers[5]].trim(),
+                    row[headers[6]].trim(),
                     null
                 )
             }

@@ -5,27 +5,35 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
+import com.xlebo.networking.HemaRatingClient
 import com.xlebo.screens.CreateTournament
 import com.xlebo.screens.HomeScreen
 import com.xlebo.screens.NestedNavigation
 import com.xlebo.screens.Screen
 import com.xlebo.screens.TournamentDetailScreen
 import com.xlebo.viewModel.SharedViewModel
+import io.github.aakira.napier.Napier
 import org.koin.compose.KoinApplication
 import org.koin.dsl.module
 
 @Composable
-fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null) {
+fun App(
+    hemaRatingClient: HemaRatingClient,
+    lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null
+) {
+    val coroutineScope = rememberCoroutineScope()
+    Napier.i { "Baklažánske UTF-8" }
     KoinApplication(
         application = {
             modules(
                 module {
-                    single { SharedViewModel() }
+                    single { SharedViewModel(hemaRatingClient, coroutineScope) }
                 }
             )
         }
@@ -56,7 +64,7 @@ fun App(lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = nu
                         composable<Screen.TournamentDetail> {
                             TournamentDetailScreen(
                                 navController = navigationController,
-                                lazyListScrollBar,
+                                lazyListScrollBar = lazyListScrollBar,
                             )
                         }
                     }

@@ -4,5 +4,5 @@ interface TableValue {
 
     fun getHeaders(): List<String>
 
-    fun getWeights(): List<Float>
+    fun getWeightsForPreview(): List<Float>
 }

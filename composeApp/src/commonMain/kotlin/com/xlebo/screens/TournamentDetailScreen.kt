@@ -30,12 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.xlebo.model.Participant
-import com.xlebo.modifierUtils.backButton
-import com.xlebo.modifierUtils.defaultButton
 import com.xlebo.screens.dialog.NotImplementedDialog
 import com.xlebo.screens.table.NewParticipantTableRow
 import com.xlebo.screens.table.ParticipantTableRow
 import com.xlebo.screens.table.TableHeader
+import com.xlebo.utils.backButton
+import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -73,7 +73,7 @@ fun TournamentDetailScreen(
                 }
 
                 stickyHeader {
-                    TableHeader(Participant.getHeaders(), Participant.getWeights())
+                    TableHeader(Participant.getHeaders(), Participant.getWeightsForPreview())
                 }
 
                 items(uiState.participants, key = { item -> item.order }) { participant ->
@@ -82,7 +82,7 @@ fun TournamentDetailScreen(
 
                 item {
                     NewParticipantTableRow(
-                        Participant.getWeights(),
+                        Participant.getWeightsForPreview(),
                         uiState.participants.size + 1,
                     ) { participant ->
                         viewModel.addParticipant(participant)
@@ -102,7 +102,7 @@ fun TournamentDetailScreen(
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.defaultButton(),
-                            onClick = { notImplementedDialog = true }
+                            onClick = { viewModel.fetchParticipantRanks() }
                         ) { Text("Fetch Ranks") }
                         Button(
                             modifier = Modifier.defaultButton(),

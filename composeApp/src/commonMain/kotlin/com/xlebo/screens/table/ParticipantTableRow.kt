@@ -61,7 +61,7 @@ fun ParticipantTableRow(participant: Participant) {
             }
             .fillMaxWidth()
     ) {
-        val weights = Participant.getWeights()
+        val weights = Participant.getWeightsForPreview()
 
         TableCell(
             participant.order.toString(),

@@ -1,4 +1,4 @@
-package com.xlebo.modifierUtils
+package com.xlebo.utils
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size

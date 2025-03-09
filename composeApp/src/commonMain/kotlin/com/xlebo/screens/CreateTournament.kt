@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.xlebo.Platform
-import com.xlebo.modifierUtils.backButton
-import com.xlebo.modifierUtils.defaultButton
+import com.xlebo.utils.backButton
+import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
