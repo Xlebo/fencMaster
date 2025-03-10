@@ -24,9 +24,18 @@ fun main() = application {
         icon = painterResource(Res.drawable.mec)
     ) {
 
-        App(hemaRatingClient = remember {
-            HemaRatingClient(createHttpClient(OkHttp.create()), System.getenv("hr.apikey"))
-        }) { modifier, lazyListState -> getVerticalScrollbar(modifier, lazyListState) }
+        App(
+            hemaRatingClient = remember {
+                HemaRatingClient(createHttpClient(OkHttp.create()), System.getenv("hr.apikey"))
+            },
+            lazyListScrollBar = { modifier, lazyListState ->
+                getVerticalScrollbar(
+                    modifier,
+                    lazyListState
+                )
+            },
+            persistenceHandler = TournamentLoader()
+        )
     }
 }
 

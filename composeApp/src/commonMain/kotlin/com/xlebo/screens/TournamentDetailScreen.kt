@@ -30,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.xlebo.model.Participant
+import com.xlebo.model.TournamentState
 import com.xlebo.screens.dialog.NotImplementedDialog
+import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.NewParticipantTableRow
 import com.xlebo.screens.table.ParticipantTableRow
 import com.xlebo.screens.table.TableHeader
@@ -39,23 +41,30 @@ import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
-
+//TODO: Progress bar on fetching fighters ranks
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TournamentDetailScreen(
     navController: NavHostController,
     lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null,
 ) {
-    var notImplementedDialog by remember { mutableStateOf(false) }
+    var submitDialog by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
-    viewModel.wakeUpHemaRatings()
-
-    if (notImplementedDialog) {
-        NotImplementedDialog { notImplementedDialog = false }
-    } else {
+    if (submitDialog) {
+        SubmitDialog(
+            onBackRequest = { submitDialog = false },
+            onContinueRequest = {
+                uiState.participants.filter { it.rank == null }.forEach {
+                    viewModel.updateParticipant(it.copy(rank = 99999))
+                }
+                viewModel.saveData(TournamentState.GROUPS_PREVIEW)
+                navController.navigate(Screen.GroupsPreview)
+            }
+        )
+    }
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 state = scrollState,
@@ -104,12 +113,12 @@ fun TournamentDetailScreen(
                         Spacer(modifier = Modifier.weight(1f))
                         Button(
                             modifier = Modifier.defaultButton(),
-                            onClick = { viewModel.fetchParticipantRanks() }
+                            onClick = { viewModel.fetchParticipantRanks(uiState.category.toInt()) }
                         ) { Text("Fetch Ranks") }
                         Button(
                             modifier = Modifier.defaultButton(),
-                            onClick = { notImplementedDialog = true }
-                        ) { Text("Preview Groups") }
+                            onClick = { submitDialog = true }
+                        ) { Text("Submit") }
                     }
                 }
             }
@@ -117,7 +126,7 @@ fun TournamentDetailScreen(
                 lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)
             }
         }
-    }
+//    }
 }
 
 

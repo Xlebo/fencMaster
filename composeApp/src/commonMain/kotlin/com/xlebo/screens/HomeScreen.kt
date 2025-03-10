@@ -36,7 +36,7 @@ fun HomeScreen(
                 Spacer(Modifier.padding(20.dp))
                 Button(
                     modifier = Modifier.defaultButton().align(Alignment.CenterHorizontally),
-                    onClick = { navController.navigate(NestedNavigation.CreateTournament) }
+                    onClick = { navController.navigate(Screen.CreateTournament) }
                 ) { Text("Založ Turnaj", fontSize = 15.sp) }
             }
             Divider(modifier = Modifier.fillMaxHeight().width(1.dp))

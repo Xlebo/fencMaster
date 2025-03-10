@@ -4,9 +4,6 @@ import kotlinx.serialization.Serializable
 
 sealed interface Screen {
     @Serializable
-    data object Navigation : Screen
-
-    @Serializable
     data object Home : Screen
 
     @Serializable
@@ -14,9 +11,13 @@ sealed interface Screen {
 
     @Serializable
     data object TournamentDetail : Screen
-}
 
-sealed interface NestedNavigation {
     @Serializable
-    data object CreateTournament : NestedNavigation
+    data object GroupsPreview : Screen
+
+    @Serializable
+    data object GroupsInProgress : Screen
+
+    @Serializable
+    data object PlayOffInProgress : Screen
 }

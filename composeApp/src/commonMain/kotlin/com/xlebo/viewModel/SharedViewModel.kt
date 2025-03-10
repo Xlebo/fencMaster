@@ -2,6 +2,7 @@ package com.xlebo.viewModel
 
 import androidx.lifecycle.ViewModel
 import com.xlebo.model.Participant
+import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
@@ -13,15 +14,19 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SharedUiState(
+    val tournamentState: TournamentState = TournamentState.NEW,
     val name: String = "Nový turnaj",
-    val filePath: String? = null,
     val participants: List<Participant> = listOf(),
-    val category: Int = 1,
-    val lowRank: Int = 3000,
-    val highRank: Int = 500
+    val category: String = "1",
+    val lowRank: String = "3000",
+    val highRank: String = "500"
 )
 
-class SharedViewModel(private val hemaRating: HemaRatingClient, private val coroutineScope: CoroutineScope) : ViewModel() {
+class SharedViewModel(
+    private val hemaRating: HemaRatingClient,
+    private val coroutineScope: CoroutineScope,
+    private val persistenceHandler: PersistenceHandler
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SharedUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -40,11 +45,8 @@ class SharedViewModel(private val hemaRating: HemaRatingClient, private val coro
     }
 
     fun setName(name: String) {
+        check(_uiState.value.tournamentState == TournamentState.NEW)
         _uiState.update { current -> current.copy(name = name) }
-    }
-
-    fun setFilePath(path: String?) {
-        _uiState.update { current -> current.copy(filePath = path) }
     }
 
     fun updateParticipant(participant: Participant) {
@@ -53,10 +55,10 @@ class SharedViewModel(private val hemaRating: HemaRatingClient, private val coro
         _uiState.update { current -> current.copy(participants = newList) }
     }
 
-    fun fetchParticipantRanks() {
+    fun fetchParticipantRanks(category: Int) {
         _uiState.value.participants.chunked(20).forEach {
             coroutineScope.launch {
-                val ranks = hemaRating.fetchParticipantRanks(it, 1)
+                val ranks = hemaRating.fetchParticipantRanks(it, category)
                 Napier.i { "Fetched ranks: $ranks" }
                 ranks.forEach { Napier.i { "$it" } }
                 ranks.forEach { updated -> updateParticipant(updated) }
@@ -64,7 +66,13 @@ class SharedViewModel(private val hemaRating: HemaRatingClient, private val coro
         }
     }
 
-    fun wakeUpHemaRatings() {
-        coroutineScope.launch { hemaRating.wakeUp() }
+    fun setCategory(category: String) {
+        _uiState.update { current -> current.copy(category = category) }
+    }
+
+    fun saveData(tournamentState: TournamentState = _uiState.value.tournamentState) {
+        if (_uiState.value.tournamentState != tournamentState)
+            _uiState.update { current -> current.copy(tournamentState = tournamentState) }
+        persistenceHandler.saveTournamentState(_uiState.value)
     }
 }
