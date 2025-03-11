@@ -67,11 +67,8 @@ fun GroupsPreviewScreen(
 
     if (submitDialog) {
         SubmitDialog(onBackRequest = { submitDialog = false }, onContinueRequest = {
-            uiState.participants.filter { it.rank == null }.forEach {
-                viewModel.updateParticipant(it.copy(rank = 99999))
-            }
-            viewModel.saveData(TournamentState.GROUPS_PREVIEW)
-            navController.navigate(Screen.GroupsPreview)
+            viewModel.saveData(TournamentState.GROUPS_STARTED)
+            navController.navigate(Screen.GroupsInProgress)
         })
     }
     Box(Modifier.fillMaxSize()) {
@@ -239,6 +236,23 @@ fun GroupsPreviewScreen(
                         }
                     }
             }
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.defaultButton(),
+                        onClick = {
+                            if (uiState.participants.all { it.group != null })
+                                submitDialog = true
+                        }
+                    ) { Text("Submit") }
+                }
+            }
+
         }
         if (lazyListScrollBar != null) {
             lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)

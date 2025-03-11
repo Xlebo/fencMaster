@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.xlebo.networking.HemaRatingClient
 import com.xlebo.screens.CreateTournament
+import com.xlebo.screens.GroupsInProgressScreen
 import com.xlebo.screens.GroupsPreviewScreen
 import com.xlebo.screens.HomeScreen
 import com.xlebo.screens.Screen
@@ -72,6 +73,13 @@ fun App(
 
                     composable<Screen.GroupsPreview> {
                         GroupsPreviewScreen(
+                            navController = navigationController,
+                            lazyListScrollBar = lazyListScrollBar
+                        )
+                    }
+
+                    composable<Screen.GroupsInProgress> {
+                        GroupsInProgressScreen(
                             navController = navigationController,
                             lazyListScrollBar = lazyListScrollBar
                         )
