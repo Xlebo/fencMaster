@@ -37,7 +37,8 @@ class SharedViewModel(
     }
 
     fun setParticipants(participants: List<Participant>) {
-        _uiState.update { current -> current.copy(participants = participants) }
+        val orderedParticipants = participants.mapIndexed { index, p -> p.copy(order = index + 1) }
+        _uiState.update { current -> current.copy(participants = orderedParticipants) }
     }
 
     fun addParticipant(participant: Participant) {

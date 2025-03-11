@@ -57,10 +57,10 @@ fun TournamentDetailScreen(
         SubmitDialog(
             onBackRequest = { submitDialog = false },
             onContinueRequest = {
-                viewModel.setParticipants(participants = uiState.participants.filter { !it.disabled })
-                uiState.participants.filter { it.rank == null }.forEach {
-                    viewModel.updateParticipant(it.copy(rank = 99999))
-                }
+                viewModel.setParticipants(
+                    participants = uiState.participants
+                    .filter { !it.disabled }
+                    .map { if (it.rank == null) it.copy(rank = 99999) else it })
                 viewModel.saveData(TournamentState.GROUPS_PREVIEW)
                 navController.navigate(Screen.GroupsPreview)
             }

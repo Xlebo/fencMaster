@@ -182,45 +182,63 @@ fun GroupsPreviewScreen(
                 }
             }
 
-            // TODO: Try implementing this using grid, so multiple groups can be displayed on the same row
-            uiState.participants.groupBy { it.group }.toList()
-                .map { group -> group.first to group.second.sortedBy { it.rank } }
-                .sortedBy { it.first }.forEach { group ->
-                    item {
-                        Row {
-                            Text("Group ${group.first}")
+            if (uiState.participants.all { it.group != null }) {
+                uiState.participants.groupBy { it.group }.toList()
+                    .map { group -> group.first to group.second.sortedBy { it.rank } }
+                    .sortedBy { it.first }.forEach { group ->
+                        item {
+                            Row {
+                                Text("Group ${group.first}")
+                            }
+                            Row {
+                                Text(
+                                    "Name",
+                                    modifier = Modifier.tournamentDetailTableCell()
+                                        .fillMaxWidth(.2f)
+                                )
+                                Text(
+                                    "Club",
+                                    modifier = Modifier.tournamentDetailTableCell()
+                                        .fillMaxWidth(.3f)
+                                )
+                                Text(
+                                    "Rank",
+                                    modifier = Modifier.tournamentDetailTableCell()
+                                        .fillMaxWidth(.2f)
+                                )
+                                Spacer(modifier = Modifier.fillMaxWidth().background(Color.White))
+                            }
                         }
-                        Row {
-                            Text("Name", modifier = Modifier.tournamentDetailTableCell().fillMaxWidth(.2f))
-                            Text("Club", modifier = Modifier.tournamentDetailTableCell().fillMaxWidth(.3f))
-                            Text("Rank", modifier = Modifier.tournamentDetailTableCell().fillMaxWidth(.2f))
-                            Spacer(modifier = Modifier.fillMaxWidth().background(Color.White))
-                        }
-                    }
-                    items(group.second) { participant ->
-                        GroupTableRow(participant, listOf(.2f, .3f, .2f), participant.getColor()) {
-                            when (selectedParticipant) {
-                                null -> {
-                                    selectedParticipant = participant
-                                }
-                                participant -> {
-                                    selectedParticipant = null
-                                }
-                                else -> {
-                                    val selectedGroup = selectedParticipant!!.group
-                                    viewModel.updateParticipant(selectedParticipant!!.copy(group = participant.group))
-                                    viewModel.updateParticipant(participant.copy(group = selectedGroup))
-                                    selectedParticipant = null
+                        items(group.second) { participant ->
+                            GroupTableRow(
+                                participant,
+                                listOf(.2f, .3f, .2f),
+                                participant.getColor()
+                            ) {
+                                when (selectedParticipant) {
+                                    null -> {
+                                        selectedParticipant = participant
+                                    }
+
+                                    participant -> {
+                                        selectedParticipant = null
+                                    }
+
+                                    else -> {
+                                        val selectedGroup = selectedParticipant!!.group
+                                        viewModel.updateParticipant(selectedParticipant!!.copy(group = participant.group))
+                                        viewModel.updateParticipant(participant.copy(group = selectedGroup))
+                                        selectedParticipant = null
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
                     }
-                }
-
+            }
         }
         if (lazyListScrollBar != null) {
             lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)
