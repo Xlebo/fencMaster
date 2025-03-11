@@ -29,13 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
-import com.xlebo.screens.dialog.NotImplementedDialog
 import com.xlebo.screens.dialog.SubmitDialog
-import com.xlebo.screens.table.NewParticipantTableRow
-import com.xlebo.screens.table.ParticipantTableRow
 import com.xlebo.screens.table.TableHeader
+import com.xlebo.screens.table.participantsPreview.NewParticipantTableRow
+import com.xlebo.screens.table.participantsPreview.ParticipantTableRow
 import com.xlebo.utils.backButton
 import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.SharedViewModel
@@ -52,11 +50,14 @@ fun TournamentDetailScreen(
     val scrollState = rememberLazyListState()
     val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    // used to keep width ratios of header and rows
+    val weights = listOf(.5f, 1f, 1.5f, 2f, 3f, 2f, 2f, 1.5f)
 
     if (submitDialog) {
         SubmitDialog(
             onBackRequest = { submitDialog = false },
             onContinueRequest = {
+                viewModel.setParticipants(participants = uiState.participants.filter { !it.disabled })
                 uiState.participants.filter { it.rank == null }.forEach {
                     viewModel.updateParticipant(it.copy(rank = 99999))
                 }
@@ -65,67 +66,77 @@ fun TournamentDetailScreen(
             }
         )
     }
-        Box(Modifier.fillMaxSize()) {
-            LazyColumn(
-                state = scrollState,
-                contentPadding = PaddingValues(15.dp)
-            ) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                    ) {
-                        Text(
-                            text = uiState.name,
-                            fontSize = 24.sp
-                        )
-                    }
-                    Spacer(Modifier.padding(20.dp))
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = scrollState,
+            contentPadding = PaddingValues(15.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = uiState.name,
+                        fontSize = 24.sp
+                    )
                 }
+                Spacer(Modifier.padding(20.dp))
+            }
 
-                stickyHeader {
-                    TableHeader(Participant.getHeaders(), Participant.getWeightsForPreview())
-                }
+            stickyHeader {
+                val headers = listOf(
+                    "Pocet",
+                    "HR ID",
+                    "Jmeno",
+                    "Prijmeni",
+                    "Klub",
+                    "Narodnost",
+                    "Jazyk",
+                    "HR Rank"
+                )
+                TableHeader(headers, weights)
+            }
 
-                items(uiState.participants, key = { item -> item.order }) { participant ->
-                    ParticipantTableRow(participant)
-                }
+            items(uiState.participants, key = { item -> item.order }) { participant ->
+                ParticipantTableRow(participant, weights)
+            }
 
-                item {
-                    NewParticipantTableRow(
-                        Participant.getWeightsForPreview(),
-                        uiState.participants.size + 1,
-                    ) { participant ->
-                        viewModel.addParticipant(participant)
-                    }
-                }
-
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        Button(
-                            modifier = Modifier.backButton(),
-                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                            onClick = { navController.popBackStack() }
-                        ) { Text("Back") }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Button(
-                            modifier = Modifier.defaultButton(),
-                            onClick = { viewModel.fetchParticipantRanks(uiState.category.toInt()) }
-                        ) { Text("Fetch Ranks") }
-                        Button(
-                            modifier = Modifier.defaultButton(),
-                            onClick = { submitDialog = true }
-                        ) { Text("Submit") }
-                    }
+            item {
+                NewParticipantTableRow(
+                    weights,
+                    uiState.participants.size + 1,
+                ) { participant ->
+                    viewModel.addParticipant(participant)
                 }
             }
-            if (lazyListScrollBar != null) {
-                lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(
+                        modifier = Modifier.backButton(),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                        onClick = { navController.popBackStack() }
+                    ) { Text("Back") }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Button(
+                        modifier = Modifier.defaultButton(),
+                        onClick = { viewModel.fetchParticipantRanks(uiState.category.toInt()) }
+                    ) { Text("Fetch Ranks") }
+                    Button(
+                        modifier = Modifier.defaultButton(),
+                        onClick = { submitDialog = true }
+                    ) { Text("Submit") }
+                }
             }
         }
+        if (lazyListScrollBar != null) {
+            lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)
+        }
+    }
 //    }
 }
 

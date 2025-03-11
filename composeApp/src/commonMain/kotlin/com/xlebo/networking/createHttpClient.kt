@@ -31,6 +31,7 @@ fun createHttpClient(engine: HttpClientEngine): HttpClient {
         }
         install(HttpTimeout) {
             requestTimeoutMillis = 30000
+            socketTimeoutMillis = 30000
         }
     }
 }

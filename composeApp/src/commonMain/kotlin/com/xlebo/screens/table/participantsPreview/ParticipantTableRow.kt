@@ -1,4 +1,4 @@
-package com.xlebo.screens.table
+package com.xlebo.screens.table.participantsPreview
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -25,11 +25,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
+import com.xlebo.screens.table.TableCell
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
-fun ParticipantTableRow(participant: Participant) {
+fun ParticipantTableRow(participant: Participant, weights: List<Float>) {
     val viewModel: SharedViewModel = koinViewModel()
     fun defaultColor(): Color {
         if (participant.disabled) {
@@ -61,7 +62,6 @@ fun ParticipantTableRow(participant: Participant) {
             }
             .fillMaxWidth()
     ) {
-        val weights = Participant.getWeightsForPreview()
 
         TableCell(
             participant.order.toString(),

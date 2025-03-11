@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
+import com.xlebo.utils.Constants
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +19,9 @@ data class SharedUiState(
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
     val category: String = "1",
-    val lowRank: String = "3000",
-    val highRank: String = "500"
+    val groupCount: String = "6",
+    val lowRank: String = Constants.LOW_SKILL_THRESHOLD.toString(),
+    val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString()
 )
 
 class SharedViewModel(
@@ -74,5 +76,54 @@ class SharedViewModel(
         if (_uiState.value.tournamentState != tournamentState)
             _uiState.update { current -> current.copy(tournamentState = tournamentState) }
         persistenceHandler.saveTournamentState(_uiState.value)
+    }
+
+    fun loadTournamentState(tournament: String) {
+        val newState = persistenceHandler.loadTournamentState(tournament)
+        _uiState.update { _ -> newState }
+        Napier.i { "Loaded state: ${uiState.value}" }
+    }
+
+    fun generateGroups() {
+        val lowRank = mutableListOf<Participant>()
+        val midRank = mutableListOf<Participant>()
+        val highRank = mutableListOf<Participant>()
+
+        val lowRankThreshold = _uiState.value.lowRank.toIntOrNull() ?: return
+        val highRankThreshold = _uiState.value.highRank.toIntOrNull() ?: return
+
+        if (lowRankThreshold < highRankThreshold) {
+            // TODO drop some actual alert, no one reads logs
+            Napier.w { "Bruh; $lowRankThreshold should be greater than $highRankThreshold" }
+            return
+        }
+
+        _uiState.value.participants.forEach { participant ->
+            when {
+                participant.rank!! < highRankThreshold -> highRank.add(participant)
+                participant.rank > lowRankThreshold -> lowRank.add(participant)
+                else -> midRank.add(participant)
+            }
+        }
+
+        lowRank.shuffle(); midRank.shuffle(); highRank.shuffle()
+
+        val groupCount = _uiState.value.groupCount.toIntOrNull() ?: return
+
+        (highRank + midRank + lowRank).forEachIndexed { index, participant ->
+            updateParticipant(participant.copy(group = index % groupCount + 1))
+        }
+    }
+
+    fun setHighRank(rank: String) {
+        _uiState.update { current -> current.copy(highRank = rank) }
+    }
+
+    fun setLowRank(rank: String) {
+        _uiState.update { current -> current.copy(lowRank = rank) }
+    }
+
+    fun setGroupCount(count: String) {
+        _uiState.update { current -> current.copy(groupCount = count) }
     }
 }

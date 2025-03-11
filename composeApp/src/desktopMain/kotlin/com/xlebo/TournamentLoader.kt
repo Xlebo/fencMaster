@@ -1,6 +1,5 @@
 package com.xlebo
 
-import com.xlebo.model.TournamentState
 import com.xlebo.viewModel.PersistenceHandler
 import com.xlebo.viewModel.SharedUiState
 import io.github.aakira.napier.Napier
@@ -9,18 +8,24 @@ import java.io.File
 import java.text.Normalizer
 import java.util.Locale
 import kotlin.io.path.Path
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 
 class TournamentLoader : PersistenceHandler {
-    private val workingDirectory = System.getProperty("user.home")
+    private val workingDirectory = Path("${System.getProperty("user.home")}/fencMaster")
 
     init {
-        Napier.i { "Initialized TournamentLoader at $workingDirectory" }
+        Napier.i { "Initialized TournamentLoader at ${workingDirectory.absolutePathString()}" }
     }
 
     override fun getExistingTournaments(): List<String> {
-        return Path(workingDirectory).listDirectoryEntries().map { it.name }
+        return if (workingDirectory.exists()) {
+            workingDirectory.listDirectoryEntries().map { it.name }
+        } else {
+            listOf()
+        }
     }
 
     override fun saveTournamentState(uiState: SharedUiState) {
@@ -46,7 +51,7 @@ class TournamentLoader : PersistenceHandler {
     }
 
     private fun getTournamentDirectory(name: String): File {
-        val dir = File("$workingDirectory/$name)")
+        val dir = File("$workingDirectory/$name")
         if (!dir.exists()) {
             Napier.i { "Creating directory: ${dir.absolutePath}" }
             dir.mkdirs()

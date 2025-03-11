@@ -93,7 +93,6 @@ fun CreateTournament(
             Text(csvPath ?: "No file selected")
         }
 
-
         Row {
             Button(
                 modifier = Modifier.backButton(),

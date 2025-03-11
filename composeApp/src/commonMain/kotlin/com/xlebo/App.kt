@@ -33,6 +33,7 @@ fun App(
     val coroutineScope = rememberCoroutineScope()
     coroutineScope.launch { hemaRatingClient.wakeUp() }
 
+
     KoinApplication(
         application = {
             modules(
@@ -53,7 +54,7 @@ fun App(
                     startDestination = Screen.Home,
                 ) {
                     composable<Screen.Home> {
-                        HomeScreen(navController = navigationController)
+                        HomeScreen(navController = navigationController, persistenceHandler = persistenceHandler)
                     }
 
                     composable<Screen.CreateTournament> {
