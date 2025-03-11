@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -21,8 +20,7 @@ kotlin {
 
     jvm("desktop")
 
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+    @OptIn(ExperimentalWasmDsl::class) wasmJs {
         moduleName = "composeApp"
         browser {
             val rootDirPath = project.rootDir.path
@@ -47,7 +45,10 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.kotlinx.coroutines.android)
         }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -66,10 +67,19 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.koin.compose.viewmodel.navigation)
+            implementation(libs.ktor.client.core)
+            implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.napier)
         }
         desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.windows_x64)
+//            implementation(compose.desktop.macos_x64)
+//            implementation(compose.desktop.linux_x64)
             runtimeOnly(libs.kotlinx.coroutines.swing)
+            implementation(libs.ktor.client.okhttp)
         }
     }
 }
@@ -100,13 +110,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
 dependencies {
-    implementation(libs.androidx.material3.android)
-    implementation(libs.androidx.compose.material)
-    implementation(libs.androidx.foundation.android)
-    implementation(libs.androidx.lifecycle.viewmodel.android)
-    debugImplementation(compose.uiTooling)
+    implementation(libs.androidx.ui.graphics.android)
 }
 
 compose.desktop {
@@ -114,9 +119,14 @@ compose.desktop {
         mainClass = "com.xlebo.MainKt"
 
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.xlebo"
-            packageVersion = "1.0.0"
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
+            packageName = "fencmaster"
+            packageVersion = "1.1.0"
+            windows {
+                iconFile.set(project.file("mec.ico"))
+                shortcut = true
+                menu = true
+            }
         }
     }
 }

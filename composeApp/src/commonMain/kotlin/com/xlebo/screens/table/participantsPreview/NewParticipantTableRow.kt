@@ -1,4 +1,4 @@
-package com.xlebo.screens.table
+package com.xlebo.screens.table.participantsPreview
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
+import com.xlebo.screens.table.TableCell
 
 @Composable
 fun NewParticipantTableRow(

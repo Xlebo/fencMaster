@@ -1,8 +1,6 @@
 package com.xlebo.screens.table
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -11,13 +9,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
+import com.xlebo.utils.tournamentDetailTableCell
 
 @Composable
 fun TableCell(
@@ -30,7 +27,7 @@ fun TableCell(
     var startingValue: String by remember { mutableStateOf(text) }
     val focusManager = LocalFocusManager.current
 
-    BasicTextField(modifier = modifier.focusable(enabled)
+    BasicTextField(modifier = modifier.tournamentDetailTableCell().focusable(enabled)
         .onKeyEvent {
             if (it.key == Key.Escape) {
                 updateField(startingValue)
@@ -51,9 +48,7 @@ fun TableCell(
                 }
             }
             true
-        }
-        .border(1.dp, Color.Black)
-        .padding(8.dp),
+        },
         value = text,
         onValueChange = {
             if (isNumber) {
