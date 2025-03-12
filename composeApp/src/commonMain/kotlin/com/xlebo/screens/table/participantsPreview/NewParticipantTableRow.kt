@@ -48,7 +48,7 @@ fun NewParticipantTableRow(
     ) {
         TableCell(order.toString(), Modifier.weight(weights[0]), enabled = false) {}
         TableCell(hrId, Modifier.weight(weights[1]), isNumber = true) { hrId = it }
-        TableCell(firstName, Modifier.weight(weights[2])) { firstName = it}
+        TableCell(firstName, Modifier.weight(weights[2])) { firstName = it }
         TableCell(lastName, Modifier.weight(weights[3])) { lastName = it }
         TableCell(club, Modifier.weight(weights[4])) { club = it }
         TableCell(nationality, Modifier.weight(weights[5])) { nationality = it }
@@ -58,7 +58,18 @@ fun NewParticipantTableRow(
             modifier = Modifier.size(25.dp).align(Alignment.CenterVertically),
             onClick = {
                 if (checkFields())
-                    onAdd(Participant(order, hrId.toIntOrNull(), firstName, lastName, club, nationality, lang, rank.toIntOrNull()))
+                    onAdd(
+                        Participant(
+                            order,
+                            hrId.toIntOrNull(),
+                            firstName,
+                            lastName.uppercase(),
+                            club,
+                            nationality,
+                            lang,
+                            rank.toIntOrNull()
+                        )
+                    )
             },
             shape = CircleShape,
             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Green),

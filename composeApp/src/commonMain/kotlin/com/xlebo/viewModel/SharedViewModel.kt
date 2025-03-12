@@ -7,6 +7,7 @@ import com.xlebo.networking.HemaRatingClient
 import com.xlebo.utils.Constants
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -21,7 +22,9 @@ data class SharedUiState(
     val category: String = "1",
     val groupCount: String = "6",
     val lowRank: String = Constants.LOW_SKILL_THRESHOLD.toString(),
-    val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString()
+    val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString(),
+    val groupMaxPoints: String = Constants.GROUP_MAX_POINTS.toString(),
+    val playoffMaxPoints: String = Constants.PLAYOFF_MAX_POINTS.toString(),
 )
 
 class SharedViewModel(
@@ -126,5 +129,13 @@ class SharedViewModel(
 
     fun setGroupCount(count: String) {
         _uiState.update { current -> current.copy(groupCount = count) }
+    }
+
+    fun setGroupMaxPoints(points: String) {
+        _uiState.update { current -> current.copy(groupMaxPoints = points) }
+    }
+
+    fun setPlayoffMaxPoints(points: String) {
+        _uiState.update { current -> current.copy(playoffMaxPoints = points) }
     }
 }

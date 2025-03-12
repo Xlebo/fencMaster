@@ -3,6 +3,7 @@ package com.xlebo.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
@@ -54,7 +55,7 @@ fun CreateTournament(
         ) {
             Text("Názov Turnaja", modifier = Modifier.padding(10.dp).weight(2f))
             OutlinedTextField(
-                modifier = Modifier.weight(4f),
+                modifier = Modifier.weight(3f),
                 value = uiState.name,
                 onValueChange = { viewModel.setName(it) },
                 singleLine = true
@@ -74,7 +75,41 @@ fun CreateTournament(
                 }
             )
 
-            Spacer(Modifier.weight(2f))
+            Spacer(Modifier.weight(1f))
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Groups Max Points: ", modifier = Modifier.padding(10.dp).weight(2f))
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = uiState.groupMaxPoints,
+                onValueChange = {
+                    val num = it.toIntOrNull()
+                    if (num != null || it.isEmpty()) {
+                        viewModel.setGroupMaxPoints(it)
+                    }
+                }
+            )
+
+            Spacer(Modifier.weight(3f))
+
+            Text("PlayOff Max Points: ", modifier = Modifier.padding(10.dp).weight(2f))
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = uiState.playoffMaxPoints,
+                onValueChange = {
+                    val num = it.toIntOrNull()
+                    if (num != null || it.isEmpty()) {
+                        viewModel.setPlayoffMaxPoints(it)
+                    }
+                }
+            )
+
+            Spacer(Modifier.weight(1f))
         }
 
         Row(

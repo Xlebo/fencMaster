@@ -29,9 +29,7 @@ class TournamentLoader : PersistenceHandler {
     }
 
     override fun saveTournamentState(uiState: SharedUiState) {
-        val dirName = Normalizer.normalize(uiState.name, Normalizer.Form.NFD)
-            .lowercase(Locale.getDefault())
-            .replace(' ', '_')
+        val dirName = uiState.name.replace(' ', '_')
 
         val tournamentDir = getTournamentDirectory(dirName)
 
