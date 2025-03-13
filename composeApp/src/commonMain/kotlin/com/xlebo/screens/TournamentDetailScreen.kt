@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.xlebo.model.TournamentState
 import com.xlebo.screens.dialog.SubmitDialog
-import com.xlebo.screens.table.TableHeader
+import com.xlebo.screens.table.participantsPreview.TableHeader
 import com.xlebo.screens.table.participantsPreview.NewParticipantTableRow
 import com.xlebo.screens.table.participantsPreview.ParticipantTableRow
 import com.xlebo.utils.backButton

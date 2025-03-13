@@ -3,6 +3,15 @@ package com.xlebo.model
 import kotlinx.serialization.Serializable
 
 @Serializable
+data class GroupStatistics(
+    val placement: Int,
+    val wins: Int,
+    val loses: Int,
+    val hitsScored: Int,
+    val hitsReceived: Int
+)
+
+@Serializable
 data class Participant(
     val order: Int,
     val hrId: Int?,
@@ -14,7 +23,7 @@ data class Participant(
     val rank: Int?,
     val disabled: Boolean = false,
     val group: Int? = null,
-    val groupScore: List<Int> = listOf()
+    val groupStatistics: GroupStatistics? = null,
 ) {
     companion object : TableValue {
         override fun getHeaders(): List<String> {

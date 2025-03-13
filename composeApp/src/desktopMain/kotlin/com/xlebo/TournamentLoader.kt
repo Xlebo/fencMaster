@@ -1,12 +1,10 @@
 package com.xlebo
 
 import com.xlebo.viewModel.PersistenceHandler
-import com.xlebo.viewModel.SharedUiState
+import com.xlebo.viewModel.TournamentState
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.text.Normalizer
-import java.util.Locale
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -28,7 +26,7 @@ class TournamentLoader : PersistenceHandler {
         }
     }
 
-    override fun saveTournamentState(uiState: SharedUiState) {
+    override fun saveTournamentState(uiState: TournamentState) {
         val dirName = uiState.name.replace(' ', '_')
 
         val tournamentDir = getTournamentDirectory(dirName)
@@ -39,13 +37,13 @@ class TournamentLoader : PersistenceHandler {
             metadataFile.createNewFile()
         }
 
-        metadataFile.writeText(Json.encodeToString(SharedUiState.serializer(), uiState))
+        metadataFile.writeText(Json.encodeToString(TournamentState.serializer(), uiState))
     }
 
-    override fun loadTournamentState(fileName: String): SharedUiState {
+    override fun loadTournamentState(fileName: String): TournamentState {
         val metadataFile = File("$workingDirectory/$fileName", "metadata.json")
 
-        return Json.decodeFromString(SharedUiState.serializer(), metadataFile.readText())
+        return Json.decodeFromString(TournamentState.serializer(), metadataFile.readText())
     }
 
     private fun getTournamentDirectory(name: String): File {

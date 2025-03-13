@@ -7,7 +7,6 @@ import com.xlebo.networking.HemaRatingClient
 import com.xlebo.utils.Constants
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SharedUiState(
+data class TournamentState(
     val tournamentState: TournamentState = TournamentState.NEW,
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
@@ -25,6 +24,7 @@ data class SharedUiState(
     val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString(),
     val groupMaxPoints: String = Constants.GROUP_MAX_POINTS.toString(),
     val playoffMaxPoints: String = Constants.PLAYOFF_MAX_POINTS.toString(),
+    val groupsResults: Map<Pair<Participant, Participant>, Pair<Int, Int>> = mapOf()
 )
 
 class SharedViewModel(
@@ -32,11 +32,11 @@ class SharedViewModel(
     private val coroutineScope: CoroutineScope,
     private val persistenceHandler: PersistenceHandler
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SharedUiState())
+    private val _uiState = MutableStateFlow(TournamentState())
     val uiState = _uiState.asStateFlow()
 
     fun reset() {
-        _uiState.update { SharedUiState() }
+        _uiState.update { TournamentState() }
     }
 
     fun setParticipants(participants: List<Participant>) {
