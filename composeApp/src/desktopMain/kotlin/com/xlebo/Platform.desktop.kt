@@ -43,11 +43,16 @@ class JVMPlatform : Platform {
                     row[headers[3]].trim().uppercase(),
                     row[headers[4]].trim(),
                     row[headers[5]].trim(),
-                    row[headers[6]].trim(),
+                    row[headers[6]].shortLang(),
                     null
                 )
             }
     }
+}
+
+fun String.shortLang() = when {
+    this.uppercase().contains("ENG") -> "ENG"
+    else -> "CZ/SK"
 }
 
 actual fun getPlatform(): Platform = JVMPlatform()

@@ -1,10 +1,13 @@
 package com.xlebo.viewModel
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
+import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.utils.Constants
+import com.xlebo.utils.generateGroupOrderOptimized
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,12 +22,13 @@ data class TournamentState(
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
     val category: String = "1",
-    val groupCount: String = "6",
-    val lowRank: String = Constants.LOW_SKILL_THRESHOLD.toString(),
-    val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString(),
+    val groupCount: String = "",
+    val lowRank: String = "",
+    val highRank: String = "",
     val groupMaxPoints: String = Constants.GROUP_MAX_POINTS.toString(),
     val playoffMaxPoints: String = Constants.PLAYOFF_MAX_POINTS.toString(),
-    val groupsResults: Map<Pair<Participant, Participant>, Pair<Int, Int>> = mapOf()
+    val groupsResults: Map<Match, Pair<Int, Int>> = mapOf(),
+    val matchOrders: Map<Int, List<Match>> = mapOf()
 )
 
 class SharedViewModel(
@@ -93,8 +97,28 @@ class SharedViewModel(
         val midRank = mutableListOf<Participant>()
         val highRank = mutableListOf<Participant>()
 
-        val lowRankThreshold = _uiState.value.lowRank.toIntOrNull() ?: return
-        val highRankThreshold = _uiState.value.highRank.toIntOrNull() ?: return
+        val sortedParticipants = _uiState.value.participants.sortedBy { it.rank }
+
+        if (_uiState.value.lowRank.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(lowRank = sortedParticipants[sortedParticipants.size * 2 / 3].rank.toString())
+            }
+        }
+
+        if (_uiState.value.highRank.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(highRank = sortedParticipants[sortedParticipants.size / 3].rank.toString())
+            }
+        }
+
+        if (_uiState.value.groupCount.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(groupCount = (sortedParticipants.size / 7 + 1).toString())
+            }
+        }
+
+        val lowRankThreshold = _uiState.value.lowRank.toInt()
+        val highRankThreshold = _uiState.value.highRank.toInt()
 
         if (lowRankThreshold < highRankThreshold) {
             // TODO drop some actual alert, no one reads logs
@@ -137,5 +161,15 @@ class SharedViewModel(
 
     fun setPlayoffMaxPoints(points: String) {
         _uiState.update { current -> current.copy(playoffMaxPoints = points) }
+    }
+
+    fun generateGroupOrder(matches: List<Match>, group: Int) {
+        val orderedMatches = generateGroupOrderOptimized(matches)
+        _uiState.update { current ->
+            current.copy(
+                matchOrders = current.matchOrders.toMutableMap()
+                    .apply { this[group] = orderedMatches })
+        }
+        persistenceHandler.saveTournamentState(uiState.value)
     }
 }

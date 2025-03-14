@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -27,8 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
-import com.xlebo.utils.createPairs
 import com.xlebo.utils.tournamentDetailTableCell
+import com.xlebo.viewModel.SharedViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 typealias Match = Pair<Participant, Participant>
 typealias ResultsMap = MutableMap<Match, Pair<String, String>>
@@ -37,22 +37,25 @@ typealias ResultsMap = MutableMap<Match, Pair<String, String>>
 fun GroupInProgressTable(
     participants: List<Participant>, maxVal: Int, onSave: (ResultsMap) -> Unit
 ) {
+    val viewModel: SharedViewModel = koinViewModel()
+    val groupNumber = participants[0].group!!
     val results = remember {
         participants.flatMapIndexed { index, first ->
             participants.drop(index + 1).map { second -> (first to second) to ("" to "") }
         }.toMutableStateMap()
     }
-
-    val matchOrder = createPairs(results.keys)
+    if (!viewModel.uiState.value.matchOrders.containsKey(groupNumber))
+        viewModel.generateGroupOrder(results.keys.toList(), groupNumber)
+    val matchesOrder = viewModel.uiState.value.matchOrders[groupNumber]!!
 
     Row {
-        Text("Group ${participants[0].group}")
+        Text("Group $groupNumber")
     }
 
     Row {
-        Column(modifier = Modifier.fillMaxWidth(.5f)) {
+        Column {
             Row(modifier = Modifier) {
-                Spacer(modifier = Modifier.width(378.dp))
+                Spacer(modifier = Modifier.width(298.dp))
                 participants.forEach {
                     Box(
                         modifier = Modifier.height(120.dp).width(50.dp).border(1.dp, Color.Black)
@@ -73,17 +76,17 @@ fun GroupInProgressTable(
                 Row(Modifier.height(40.dp)) {
                     Text(
                         p.lang ?: "",
-                        modifier = Modifier.tournamentDetailTableCell().width(80.dp),
+                        modifier = Modifier.tournamentDetailTableCell().width(50.dp),
                         maxLines = 1
                     )
                     Text(
                         p.firstName,
-                        modifier = Modifier.tournamentDetailTableCell().width(100.dp),
+                        modifier = Modifier.tournamentDetailTableCell().width(80.dp),
                         maxLines = 1
                     )
                     Text(
                         p.lastName,
-                        modifier = Modifier.tournamentDetailTableCell().width(150.dp),
+                        modifier = Modifier.tournamentDetailTableCell().width(120.dp),
                         maxLines = 1
                     )
 
@@ -137,11 +140,14 @@ fun GroupInProgressTable(
             }
         }
 
+        Spacer(Modifier.width(20.dp))
+
         Column {
             Spacer(modifier = Modifier.height(120.dp))
-            matchOrder.filterIndexed { index, _ -> index <= matchOrder.size / 2 }.forEach {
+            matchesOrder.filterIndexed { index, _ -> index <= matchesOrder.size / 2 }.forEach {
                 Text(
-                    "${it.first.lastName} vs. ${it.second.lastName}"
+                    "${it.first.lastName} ${it.first.firstName.first()}. - " +
+                            "${it.second.lastName} ${it.second.firstName.first()}."
                 )
             }
         }
@@ -150,9 +156,10 @@ fun GroupInProgressTable(
 
         Column {
             Spacer(modifier = Modifier.height(120.dp))
-            matchOrder.filterIndexed { index, _ -> index > matchOrder.size / 2 }.forEach {
+            matchesOrder.filterIndexed { index, _ -> index > matchesOrder.size / 2 }.forEach {
                 Text(
-                    "${it.first.lastName} vs. ${it.second.lastName}"
+                    "${it.first.lastName} ${it.first.firstName.first()}. - " +
+                            "${it.second.lastName} ${it.second.firstName.first()}."
                 )
             }
         }
@@ -170,7 +177,7 @@ fun EmptyCell() = Text(
 fun ScoreTextField(
     value: String, maxVal: Int, update: (String) -> Unit
 ) = BasicTextField(
-    modifier = Modifier.width(23.dp).fillMaxHeight().background(Color.LightGray)
+    modifier = Modifier.width(23.dp).fillMaxHeight()
         .padding(horizontal = 1.dp, vertical = 5.dp),
     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
     value = value,

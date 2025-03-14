@@ -3,141 +3,174 @@ package com.xlebo.utils
 import com.xlebo.model.Participant
 import com.xlebo.screens.table.groupsInProgress.Match
 
-fun createPairs(matches: Set<Match>): List<Match> {
-    if (matches.size < 3) return matches.toList().shuffled()
+/**
+ * Stolen from mr. Claude.ai
+ */
+fun generateGroupOrder(matches: List<Match>): List<Match> {
+    if (matches.size <= 1) return matches
 
-    val result = mutableListOf<Pair<Participant, Participant>>()
-    val remainingPairs = matches.toMutableList()
+    val remainingMatches = matches.toMutableList()
+    val result = mutableListOf<Match>()
 
-    result.add(remainingPairs.removeAt(0))
+    result.add(remainingMatches.removeAt(0))
 
-    while (remainingPairs.isNotEmpty()) {
-        val lastPair = result.last()
-        val lastParticipants = setOf(lastPair.first, lastPair.second)
+    var lastParticipants = setOf(result.last().first, result.last().second)
 
-        val nextPairIndex = remainingPairs.indexOfFirst { pair ->
-            setOf(pair.first, pair.second).intersect(lastParticipants).isEmpty()
+    while (remainingMatches.isNotEmpty()) {
+        val nextMatchIndex = remainingMatches.indexOfFirst { match ->
+            val currentParticipants = setOf(match.first, match.second)
+            currentParticipants.intersect(lastParticipants).isEmpty()
         }
 
-        if (nextPairIndex != -1) {
-            result.add(remainingPairs.removeAt(nextPairIndex))
+        if (nextMatchIndex != -1) {
+            val nextMatch = remainingMatches.removeAt(nextMatchIndex)
+            result.add(nextMatch)
+            lastParticipants = setOf(nextMatch.first, nextMatch.second)
         } else {
-            if (remainingPairs.size > 1) {
-                var bestSequence = emptyList<Pair<Participant, Participant>>()
-                var bestScore = Int.MIN_VALUE
-
-                for (i in remainingPairs.indices) {
-                    val testSequence = mutableListOf<Pair<Participant, Participant>>()
-                    val testRemaining = remainingPairs.toMutableList()
-                    val firstPair = testRemaining.removeAt(i)
-                    testSequence.add(firstPair)
-
-                    var score =
-                        if (setOf(firstPair.first, firstPair.second).intersect(lastParticipants)
-                                .isEmpty()
-                        ) 1 else 0
-
-                    while (testRemaining.isNotEmpty()) {
-                        val testLastPair = testSequence.last()
-                        val testLastParticipants =
-                            setOf(testLastPair.first, testLastPair.second)
-
-                        val testNextPairIndex = testRemaining.indexOfFirst { pair ->
-                            setOf(pair.first, pair.second).intersect(testLastParticipants)
-                                .isEmpty()
-                        }
-
-                        if (testNextPairIndex != -1) {
-                            testSequence.add(testRemaining.removeAt(testNextPairIndex))
-                            score++
-                        } else if (testRemaining.isNotEmpty()) {
-                            testSequence.add(testRemaining.removeFirst())
-                        }
-                    }
-
-                    if (score > bestScore) {
-                        bestScore = score
-                        bestSequence = testSequence
-                    }
-                }
-
-                if (bestSequence.isNotEmpty()) {
-                    result.addAll(bestSequence)
-                    remainingPairs.clear()
-                } else {
-                    result.add(remainingPairs.removeAt(0))
-                }
-            } else {
-                result.add(remainingPairs.removeAt(0))
+            // No suitable match found, use backtracking to find a better solution
+            // We'll restart with a different initial match
+            // If we've tried all possible starting matches, we'll fall back to shuffling
+            if (result.size == 1 && remainingMatches.isEmpty()) {
+                return matches.shuffled()
             }
+
+            // Start over with a different match
+            remainingMatches.addAll(result)
+            remainingMatches.shuffle()
+            result.clear()
+            result.add(remainingMatches.removeAt(0))
+            lastParticipants = setOf(result.last().first, result.last().second)
         }
     }
 
-    if (!isValidOrdering(result)) {
-        return matches.shuffled()
+    // Validate the result - no consecutive matches should share participants
+    for (i in 0 until result.size - 1) {
+        val currentParticipants = setOf(result[i].first, result[i].second)
+        val nextParticipants = setOf(result[i + 1].first, result[i + 1].second)
+
+        if (currentParticipants.intersect(nextParticipants).isNotEmpty()) {
+            // If validation fails, we might not have a possible solution
+            // Fall back to shuffling and hoping for the best
+            return matches.shuffled()
+        }
     }
 
     return result
 }
 
-private fun isValidOrdering(pairs: List<Pair<Participant, Participant>>): Boolean {
-    if (pairs.size <= 1) return true
+/**
+ * A more advanced implementation using graph theory concepts.
+ * Treats the problem as finding a path in a graph where:
+ * - Vertices are matches
+ * - Edges exist between matches that don't share participants
+ *
+ * This approach has better performance for larger groups.
+ */
+fun generateGroupOrderOptimized(matches: List<Match>): List<Match> {
+    if (matches.size <= 1) return matches
 
-    for (i in 0 until pairs.size - 1) {
-        val currentPair = setOf(pairs[i].first, pairs[i].second)
-        val nextPair = setOf(pairs[i + 1].first, pairs[i + 1].second)
+    // Build an adjacency list representation of the graph
+    val adjacencyList = buildAdjacencyList(matches)
 
-        if (currentPair.intersect(nextPair).isNotEmpty()) {
+    // Try to find a valid path through all matches
+    for (startIndex in matches.indices) {
+        val path = findPath(startIndex, matches, adjacencyList)
+        if (path.size == matches.size) {
+            return path
+        }
+    }
+
+    // If we couldn't find a complete path, try a greedy approach
+    val greedyResult = generateGroupOrder(matches)
+
+    // If the greedy approach found a valid solution, return it
+    if (isValidOrdering(greedyResult)) {
+        return greedyResult
+    }
+
+    // Otherwise, just shuffle and hope for the best
+    return matches.shuffled()
+}
+
+/**
+ * Builds an adjacency list where each match is connected to all other
+ * matches that don't share any participants.
+ */
+private fun buildAdjacencyList(matches: List<Pair<Participant, Participant>>): List<List<Int>> {
+    val adjacencyList = List(matches.size) { mutableListOf<Int>() }
+
+    for (i in matches.indices) {
+        val participantsI = setOf(matches[i].first, matches[i].second)
+
+        for (j in matches.indices) {
+            if (i == j) continue
+
+            val participantsJ = setOf(matches[j].first, matches[j].second)
+
+            // If matches don't share participants, add an edge
+            if (participantsI.intersect(participantsJ).isEmpty()) {
+                adjacencyList[i].add(j)
+            }
+        }
+    }
+
+    return adjacencyList
+}
+
+/**
+ * Uses depth-first search to find a path through the graph that visits
+ * all matches without consecutive matches sharing participants.
+ */
+private fun findPath(
+    startIndex: Int,
+    matches: List<Pair<Participant, Participant>>,
+    adjacencyList: List<List<Int>>
+): List<Pair<Participant, Participant>> {
+    val visited = BooleanArray(matches.size) { false }
+    val path = mutableListOf<Pair<Participant, Participant>>()
+
+    fun dfs(currentIndex: Int): Boolean {
+        visited[currentIndex] = true
+        path.add(matches[currentIndex])
+
+        // If we've visited all matches, we're done
+        if (path.size == matches.size) {
+            return true
+        }
+
+        // Try all neighboring matches
+        for (nextIndex in adjacencyList[currentIndex]) {
+            if (!visited[nextIndex]) {
+                if (dfs(nextIndex)) {
+                    return true
+                }
+            }
+        }
+
+        // If we couldn't complete the path from here, backtrack
+        visited[currentIndex] = false
+        path.removeAt(path.size - 1)
+        return false
+    }
+
+    dfs(startIndex)
+    return path
+}
+
+/**
+ * Checks if a match ordering is valid (no consecutive matches share participants).
+ */
+private fun isValidOrdering(matches: List<Pair<Participant, Participant>>): Boolean {
+    if (matches.size <= 1) return true
+
+    for (i in 0 until matches.size - 1) {
+        val currentParticipants = setOf(matches[i].first, matches[i].second)
+        val nextParticipants = setOf(matches[i + 1].first, matches[i + 1].second)
+
+        if (currentParticipants.intersect(nextParticipants).isNotEmpty()) {
             return false
         }
     }
 
     return true
-}
-
-
-data class GroupingResult(
-    val numberOfGroups: Int,
-    val groupSizes: List<Int>,
-    val totalMatches: Int
-) {
-    override fun toString(): String {
-        return """
-            |Optimal Grouping:
-            |Number of groups: $numberOfGroups
-            |Group sizes: ${groupSizes.joinToString(", ")}
-            |Total matches: $totalMatches
-            |Average matches per group: ${totalMatches.toDouble() / numberOfGroups}
-        """.trimMargin()
-    }
-}
-
-fun findOptimalGroups(totalParticipants: Int, minGroupSize: Int = 5): GroupingResult {
-    require(totalParticipants >= minGroupSize) { "Total participants must be at least the minimum group size" }
-
-    val possibleSolutions = mutableListOf<GroupingResult>()
-
-    val maxGroups = totalParticipants / minGroupSize
-
-    for (numGroups in 1..maxGroups) {
-        val avgGroupSize = totalParticipants / numGroups
-        val remainder = totalParticipants % numGroups
-
-        val groupSizes = List(numGroups) { i ->
-            if (i < remainder) avgGroupSize + 1 else avgGroupSize
-        }
-
-        if (groupSizes.all { it >= minGroupSize }) {
-            val totalMatches = groupSizes.sumOf { groupSize -> groupSize * (groupSize - 1) / 2 }
-
-            possibleSolutions.add(GroupingResult(
-                numberOfGroups = numGroups,
-                groupSizes = groupSizes,
-                totalMatches = totalMatches
-            ))
-        }
-    }
-
-    return possibleSolutions.minByOrNull { it.totalMatches }
-        ?: throw IllegalStateException("No valid grouping found")
 }

@@ -78,7 +78,7 @@ fun GroupsInProgressScreen(
 
             items(
                 uiState.participants.groupBy { it.group }.toList()
-                .map { group -> group.first to group.second.sortedBy { it.order } }
+                .map { group -> group.first to group.second.sortedBy { it.rank } }
                 .sortedBy { it.first })
             { group ->
                 GroupInProgressTable(group.second, uiState.groupMaxPoints.toInt()) { }
