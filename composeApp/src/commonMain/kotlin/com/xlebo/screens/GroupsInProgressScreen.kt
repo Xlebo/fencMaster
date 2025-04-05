@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.xlebo.model.GroupResults
 import com.xlebo.model.TournamentState
 import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.groupsInProgress.GroupInProgressTable
@@ -77,11 +78,12 @@ fun GroupsInProgressScreen(
             }
 
             items(
-                uiState.participants.groupBy { it.group }.toList()
-                .map { group -> group.first to group.second.sortedBy { it.rank } }
-                .sortedBy { it.first })
-            { group ->
-                GroupInProgressTable(group.second, uiState.groupMaxPoints.toInt()) { }
+                items = uiState.groupsResults.entries.toList().sortedBy { it.key }
+            ) { group ->
+                GroupInProgressTable(
+                    groupNo = group.key,
+                    maxVal = uiState.groupMaxPoints.toInt()
+                )
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }

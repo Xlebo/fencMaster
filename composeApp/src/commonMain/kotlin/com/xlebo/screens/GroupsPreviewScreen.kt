@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.xlebo.model.GroupResults
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.screens.dialog.SubmitDialog
@@ -71,10 +72,22 @@ fun GroupsPreviewScreen(
 
     if (submitDialog) {
         SubmitDialog(onBackRequest = { submitDialog = false }, onContinueRequest = {
+            viewModel.setGroupsResults(
+                uiState.participants.groupBy { it.group }.map { group ->
+                    val participants = group.value.sortedBy { it.order }
+                    val results = participants.flatMapIndexed { index, first ->
+                        participants.drop(index + 1)
+                            .map { second -> (first to second) to ("" to "") }
+                    }.toMap()
+                    group.key!! to GroupResults(group.key!!, results, false)
+                }.toMap()
+            )
+
             viewModel.saveData(TournamentState.GROUPS_STARTED)
             navController.navigate(Screen.GroupsInProgress)
         })
     }
+
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             state = scrollState, contentPadding = PaddingValues(15.dp)
@@ -207,7 +220,9 @@ fun GroupsPreviewScreen(
                                     modifier = Modifier.tournamentDetailTableCell()
                                         .fillMaxWidth(.2f)
                                 )
-                                Spacer(modifier = Modifier.fillMaxWidth().background(Color.White))
+                                Spacer(
+                                    modifier = Modifier.fillMaxWidth().background(Color.White)
+                                )
                             }
                         }
                         items(group.second) { participant ->
@@ -227,7 +242,11 @@ fun GroupsPreviewScreen(
 
                                     else -> {
                                         val selectedGroup = selectedParticipant!!.group
-                                        viewModel.updateParticipant(selectedParticipant!!.copy(group = participant.group))
+                                        viewModel.updateParticipant(
+                                            selectedParticipant!!.copy(
+                                                group = participant.group
+                                            )
+                                        )
                                         viewModel.updateParticipant(participant.copy(group = selectedGroup))
                                         selectedParticipant = null
                                     }

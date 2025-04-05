@@ -2,6 +2,7 @@ package com.xlebo.viewModel
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
+import com.xlebo.model.GroupResults
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
@@ -27,7 +28,7 @@ data class TournamentState(
     val highRank: String = "",
     val groupMaxPoints: String = Constants.GROUP_MAX_POINTS.toString(),
     val playoffMaxPoints: String = Constants.PLAYOFF_MAX_POINTS.toString(),
-    val groupsResults: Map<Match, Pair<Int, Int>> = mapOf(),
+    val groupsResults: Map<Int, GroupResults> = mapOf(),
     val matchOrders: Map<Int, List<Match>> = mapOf()
 )
 
@@ -171,5 +172,23 @@ class SharedViewModel(
                     .apply { this[group] = orderedMatches })
         }
         persistenceHandler.saveTournamentState(uiState.value)
+    }
+
+    fun updateResultForGroup(groupNo: Int, pair: Match, score: Pair<String, String>) {
+        val newGroupResults = _uiState.value.groupsResults.toMutableMap()
+        val newResults = newGroupResults[groupNo]!!.results.toMutableMap()
+        newResults[pair] = score
+        newGroupResults[groupNo] = newGroupResults[groupNo]!!.copy(results = newResults)
+        _uiState.update { current -> current.copy(groupsResults = newGroupResults) }
+    }
+
+    fun updateGroupResults(groupResults: GroupResults) {
+        val newGroupResults = _uiState.value.groupsResults.toMutableMap()
+        newGroupResults[groupResults.id] = groupResults
+        _uiState.update { current -> current.copy(groupsResults = newGroupResults) }
+    }
+
+    fun setGroupsResults(groupsResults: Map<Int, GroupResults>) {
+        _uiState.update { current -> current.copy(groupsResults = groupsResults)}
     }
 }

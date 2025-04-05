@@ -16,6 +16,7 @@ import io.ktor.http.contentType
 import io.ktor.http.path
 
 class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: String) {
+    private var online = true
 
     init {
         if (apiKey.isEmpty())
@@ -27,6 +28,10 @@ class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: S
         participants: List<Participant>,
         category: Int
     ): List<Participant> {
+        if (!online) {
+            Napier.w("Can't connect to Hema Ratings")
+            return listOf()
+        }
         if (apiKey.isEmpty()) {
             Napier.w("API KEY IS NOT SET")
         }
@@ -71,15 +76,20 @@ class HemaRatingClient(private val httpClient: HttpClient, private val apiKey: S
 
     suspend fun wakeUp() {
         Napier.i { "Waking up Hema Ratings"}
-        httpClient.get(Constants.HEMARATINGS_API) {
-            url {
-                protocol = URLProtocol.HTTPS
-                host = Constants.HEMARATINGS_API
-                path("wakeup")
+        try {
+            httpClient.get(Constants.HEMARATINGS_API) {
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = Constants.HEMARATINGS_API
+                    path("wakeup")
+                }
+                headers {
+                    append("x-functions-key", apiKey)
+                }
             }
-            headers {
-                append("x-functions-key", apiKey)
-            }
+        } catch (e: Exception) {
+            Napier.w( "Failed to wake up Hema Ratings, fetching is disabled.")
+            online = false
         }
     }
 }

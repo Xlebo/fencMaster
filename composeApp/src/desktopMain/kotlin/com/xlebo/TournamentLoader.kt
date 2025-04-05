@@ -13,6 +13,10 @@ import kotlin.io.path.name
 
 class TournamentLoader : PersistenceHandler {
     private val workingDirectory = Path("${System.getProperty("user.home")}/fencMaster")
+    val json = Json {
+        prettyPrint = true
+        allowStructuredMapKeys = true
+    }
 
     init {
         Napier.i { "Initialized TournamentLoader at ${workingDirectory.absolutePathString()}" }
@@ -37,13 +41,13 @@ class TournamentLoader : PersistenceHandler {
             metadataFile.createNewFile()
         }
 
-        metadataFile.writeText(Json.encodeToString(TournamentState.serializer(), uiState))
+        metadataFile.writeText(json.encodeToString(TournamentState.serializer(), uiState))
     }
 
     override fun loadTournamentState(fileName: String): TournamentState {
         val metadataFile = File("$workingDirectory/$fileName", "metadata.json")
 
-        return Json.decodeFromString(TournamentState.serializer(), metadataFile.readText())
+        return json.decodeFromString(TournamentState.serializer(), metadataFile.readText())
     }
 
     private fun getTournamentDirectory(name: String): File {
