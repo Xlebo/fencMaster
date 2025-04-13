@@ -1,6 +1,5 @@
 package com.xlebo.viewModel
 
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
 import com.xlebo.model.GroupResults
 import com.xlebo.model.Participant

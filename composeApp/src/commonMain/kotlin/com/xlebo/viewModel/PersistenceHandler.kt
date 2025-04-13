@@ -8,7 +8,7 @@ interface PersistenceHandler {
 
     fun getExistingTournaments(): List<String>
 
-    fun saveTournamentState(uiState: com.xlebo.viewModel.TournamentState)
+    fun saveTournamentState(uiState: TournamentState)
 
-    fun loadTournamentState(fileName: String): com.xlebo.viewModel.TournamentState
+    fun loadTournamentState(fileName: String): TournamentState
 }
