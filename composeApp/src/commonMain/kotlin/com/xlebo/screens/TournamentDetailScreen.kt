@@ -61,6 +61,7 @@ fun TournamentDetailScreen(
                     participants = uiState.participants
                     .filter { !it.disabled }
                     .map { if (it.rank == null) it.copy(rank = 99999) else it })
+                viewModel.generateGroups()
                 viewModel.saveData(TournamentState.GROUPS_PREVIEW)
                 navController.navigate(Screen.GroupsPreview)
             }
@@ -137,7 +138,6 @@ fun TournamentDetailScreen(
             lazyListScrollBar(Modifier.align(Alignment.CenterEnd).fillMaxHeight(), scrollState)
         }
     }
-//    }
 }
 
 

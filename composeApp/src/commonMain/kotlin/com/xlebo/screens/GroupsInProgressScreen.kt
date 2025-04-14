@@ -1,7 +1,9 @@
 package com.xlebo.screens
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,11 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.model.GroupResults
 import com.xlebo.model.TournamentState
+import com.xlebo.screens.dialog.AlertDialog
 import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.groupsInProgress.GroupInProgressTable
 import com.xlebo.utils.backButton
+import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.SharedViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -40,17 +43,25 @@ fun GroupsInProgressScreen(
     lazyListScrollBar: @Composable ((Modifier, LazyListState) -> Unit)? = null,
 ) {
     var submitDialog by remember { mutableStateOf(false) }
+    var alertDialog by remember { mutableStateOf(false) }
+
     val scrollState = rememberLazyListState()
     val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
     if (submitDialog) {
         SubmitDialog(onBackRequest = { submitDialog = false }, onContinueRequest = {
+            viewModel.calculateGroupStatistics()
             viewModel.saveData(TournamentState.GROUPS_STARTED)
-            navController.navigate(Screen.GroupsInProgress)
+            navController.navigate(Screen.PlayOffPreview )
         })
     }
 
+    if (alertDialog) {
+        AlertDialog("Submit all results", "Make sure all result fields are filled") {
+            alertDialog = false
+        }
+    }
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
             state = scrollState, contentPadding = PaddingValues(15.dp)
@@ -85,6 +96,26 @@ fun GroupsInProgressScreen(
                     maxVal = uiState.groupMaxPoints.toInt()
                 )
                 Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                Row(horizontalArrangement = Arrangement.End) {
+                    Button(
+                        modifier = Modifier.defaultButton(),
+                        onClick = {
+                            if (uiState.groupsResults.values.all {
+                                    it.results.all { result ->
+                                        result.value.first.isNotEmpty() && result.value.second.isNotEmpty()
+                                    }
+                                }) {
+                                submitDialog = true
+                            } else {
+                                alertDialog = true
+                            }
+                        }) {
+                        Text("Submit")
+                    }
+                }
             }
         }
         if (lazyListScrollBar != null) {

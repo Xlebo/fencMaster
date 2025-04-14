@@ -54,10 +54,6 @@ fun GroupsPreviewScreen(
     val uiState by viewModel.uiState.collectAsState()
     var selectedParticipant: Participant? by remember { mutableStateOf(null) }
 
-    if (uiState.participants.all { it.group == null }) {
-        viewModel.generateGroups()
-    }
-
     fun Participant.getColor(): Color {
         if (uiState.highRank.isEmpty() || uiState.lowRank.isEmpty()) {
             return Color.White

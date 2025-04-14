@@ -2,6 +2,7 @@ package com.xlebo.viewModel
 
 import androidx.lifecycle.ViewModel
 import com.xlebo.model.GroupResults
+import com.xlebo.model.GroupStatistics
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
@@ -188,6 +189,78 @@ class SharedViewModel(
     }
 
     fun setGroupsResults(groupsResults: Map<Int, GroupResults>) {
-        _uiState.update { current -> current.copy(groupsResults = groupsResults)}
+        _uiState.update { current -> current.copy(groupsResults = groupsResults) }
+    }
+
+    fun calculateGroupStatistics() {
+        // replace all Vs by actual values
+        _uiState.update { current ->
+            current.copy(groupsResults = _uiState.value.groupsResults.map { gr ->
+                gr.key to gr.value.copy(
+                    results = gr.value.results.map {
+                        it.key to (
+                                it.value.first.replace("V", _uiState.value.groupMaxPoints) to
+                                        it.value.second.replace("V", _uiState.value.groupMaxPoints)
+                                )
+                    }.toMap()
+                )
+            }.toMap())
+        }
+
+        _uiState.value.groupsResults.values.forEach { group ->
+            evaluateGroupStatistics(group).forEach { participant ->
+                this.updateParticipant(participant)
+            }
+        }
+
+        val participantsOrdered = _uiState.value.participants.sortedWith(
+            compareBy(
+                { it.groupStatistics!!.wins / it.groupStatistics.totalMatches },
+                { it.groupStatistics!!.hitsScored },
+                { it.groupStatistics!!.hitsReceived }
+            )
+        )
+            .mapIndexed { index, participant ->
+                participant.copy(playOffOrder = index + 1)
+            }
+
+        this.setParticipants(participantsOrdered)
+    }
+
+    private fun evaluateGroupStatistics(group: GroupResults): List<Participant> {
+        val WINS = 0
+        val ALL = 1
+        val SCORED = 2
+        val RECEIVED = 3
+
+        val statistics = group.results.flatMap { listOf(it.key.first, it.key.second) }.distinct()
+            .associateWith { mutableListOf(0f, 0f, 0f, 0f) }
+            .toMap()
+
+        group.results.forEach { (participants, results) ->
+            val (p1, p2) = participants
+            statistics[p1]!![ALL]++
+            statistics[p1]!![SCORED] += results.first.toFloat()
+            statistics[p1]!![RECEIVED] += results.second.toFloat()
+
+            statistics[p2]!![ALL]++
+            statistics[p2]!![SCORED] += results.second.toFloat()
+            statistics[p2]!![RECEIVED] += results.first.toFloat()
+
+            when {
+                results.first == results.second -> {
+                    statistics[p1]!![WINS] += 0.5f
+                    statistics[p2]!![WINS] += 0.5f
+                }
+
+                results.first.toInt() < results.second.toInt() ->
+                    statistics[p2]!![WINS]++
+
+                else ->
+                    statistics[p1]!![WINS]++
+            }
+        }
+
+        return statistics.keys.map { it.copy(groupStatistics = GroupStatistics(statistics[it]!!)) }
     }
 }

@@ -19,5 +19,5 @@ sealed interface Screen {
     data object GroupsInProgress : Screen
 
     @Serializable
-    data object PlayOffInProgress : Screen
+    data object PlayOffPreview : Screen
 }
