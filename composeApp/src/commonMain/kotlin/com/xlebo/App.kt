@@ -16,6 +16,7 @@ import com.xlebo.screens.CreateTournament
 import com.xlebo.screens.GroupsInProgressScreen
 import com.xlebo.screens.GroupsPreviewScreen
 import com.xlebo.screens.HomeScreen
+import com.xlebo.screens.PlayOffPreviewScreen
 import com.xlebo.screens.Screen
 import com.xlebo.screens.TournamentDetailScreen
 import com.xlebo.viewModel.PersistenceHandler
@@ -82,6 +83,13 @@ fun App(
                         GroupsInProgressScreen(
                             navController = navigationController,
                             lazyListScrollBar = lazyListScrollBar
+                        )
+                    }
+
+                    composable<Screen.PlayOffPreview> {
+                        PlayOffPreviewScreen(
+                            navigationController,
+                            lazyListScrollBar
                         )
                     }
                 }

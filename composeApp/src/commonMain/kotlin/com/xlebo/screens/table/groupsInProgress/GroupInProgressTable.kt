@@ -2,7 +2,6 @@ package com.xlebo.screens.table.groupsInProgress
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,8 +22,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -33,11 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.xlebo.model.Participant
-import com.xlebo.utils.backButton
 import com.xlebo.utils.defaultButton
 import com.xlebo.utils.tournamentDetailTableCell
 import com.xlebo.viewModel.SharedViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.compose.viewmodel.koinViewModel
 
 typealias Match = Pair<Participant, Participant>
@@ -53,7 +48,7 @@ fun GroupInProgressTable(
     val participants = uiState.participants.filter { it.group == groupNo }.sortedBy { it.order }
 
     val groupResults = uiState.groupsResults[groupNo]!!
-    var isLocked = mutableStateOf(groupResults.locked)
+    val isLocked = mutableStateOf(groupResults.locked)
 
     if (!viewModel.uiState.value.matchOrders.containsKey(groupNo))
         viewModel.generateGroupOrder(groupResults.results.keys.toList(), groupNo)

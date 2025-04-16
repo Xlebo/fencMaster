@@ -52,7 +52,7 @@ fun GroupsInProgressScreen(
     if (submitDialog) {
         SubmitDialog(onBackRequest = { submitDialog = false }, onContinueRequest = {
             viewModel.calculateGroupStatistics()
-            viewModel.saveData(TournamentState.GROUPS_STARTED)
+            viewModel.saveData(TournamentState.PLAYOFF)
             navController.navigate(Screen.PlayOffPreview )
         })
     }

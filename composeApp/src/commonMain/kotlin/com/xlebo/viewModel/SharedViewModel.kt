@@ -214,11 +214,10 @@ class SharedViewModel(
         }
 
         val participantsOrdered = _uiState.value.participants.sortedWith(
-            compareBy(
-                { it.groupStatistics!!.wins / it.groupStatistics.totalMatches },
-                { it.groupStatistics!!.hitsScored },
-                { it.groupStatistics!!.hitsReceived }
-            )
+            compareByDescending<Participant> { it.groupStatistics!!.wins / it.groupStatistics.totalMatches }
+                .thenByDescending{ it.groupStatistics!!.hitsScored }
+                .thenBy { it.groupStatistics!!.hitsReceived }
+
         )
             .mapIndexed { index, participant ->
                 participant.copy(playOffOrder = index + 1)
