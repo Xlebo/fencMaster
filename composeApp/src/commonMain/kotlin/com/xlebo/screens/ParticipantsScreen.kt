@@ -78,7 +78,7 @@ fun TournamentDetailScreen(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = uiState.name,
+                        text = "${uiState.name} Participants",
                         fontSize = 24.sp
                     )
                 }

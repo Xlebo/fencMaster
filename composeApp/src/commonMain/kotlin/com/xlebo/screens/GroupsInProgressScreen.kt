@@ -81,7 +81,7 @@ fun GroupsInProgressScreen(
                         }) { Text("Home") }
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = uiState.name,
+                        text = "${uiState.name} Groups In Progress",
                         fontSize = 24.sp
                     )
                 }

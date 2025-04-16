@@ -70,7 +70,7 @@ fun PlayOffPreviewScreen(
                         }) { Text("Home") }
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = "${uiState.name} PlayOff",
+                        text = "${uiState.name} PlayOff Preview",
                         fontSize = 24.sp
                     )
                 }

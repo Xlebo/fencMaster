@@ -102,8 +102,7 @@ fun GroupsPreviewScreen(
                             viewModel.reset()
                         }) { Text("Home") }
                     Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = uiState.name,
+                        text = "${uiState.name} Groups Preview",
                         fontSize = 24.sp
                     )
                 }
