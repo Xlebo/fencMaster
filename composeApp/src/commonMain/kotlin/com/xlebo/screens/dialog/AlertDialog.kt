@@ -6,10 +6,10 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 
 @Composable
-fun NotImplementedDialog(onDismissRequest: () -> Unit) {
+fun AlertDialog(title: String, text: String, onDismissRequest: () -> Unit) {
     AlertDialog(
-        title = { Text("Not Implemented Yet") },
-        text = { Text("Sucks, huh?") },
+        title = { Text(title) },
+        text = { Text(text) },
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(onClick = onDismissRequest ) {

@@ -10,6 +10,7 @@ import java.io.File
 
 class JVMPlatform : Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
+    private val tournamentLoader = TournamentLoader()
 
     override fun handleFileSelection(): String? {
         val dialog = FileDialog(ComposeWindow())
@@ -39,14 +40,19 @@ class JVMPlatform : Platform {
                     index + 1,
                     row[headers[1]].trim().toIntOrNull(),
                     row[headers[2]].trim(),
-                    row[headers[3]].trim(),
+                    row[headers[3]].trim().uppercase(),
                     row[headers[4]].trim(),
                     row[headers[5]].trim(),
-                    row[headers[6]].trim(),
+                    row[headers[6]].shortLang(),
                     null
                 )
             }
     }
+}
+
+fun String.shortLang() = when {
+    this.uppercase().contains("ENG") -> "ENG"
+    else -> "CZ/SK"
 }
 
 actual fun getPlatform(): Platform = JVMPlatform()

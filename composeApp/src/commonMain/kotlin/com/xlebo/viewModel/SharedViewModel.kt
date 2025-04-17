@@ -1,10 +1,14 @@
 package com.xlebo.viewModel
 
 import androidx.lifecycle.ViewModel
+import com.xlebo.model.GroupResults
+import com.xlebo.model.GroupStatistics
 import com.xlebo.model.Participant
 import com.xlebo.model.TournamentState
 import com.xlebo.networking.HemaRatingClient
+import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.utils.Constants
+import com.xlebo.utils.generateGroupOrderOptimized
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,14 +18,18 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SharedUiState(
+data class TournamentState(
     val tournamentState: TournamentState = TournamentState.NEW,
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
     val category: String = "1",
-    val groupCount: String = "6",
-    val lowRank: String = Constants.LOW_SKILL_THRESHOLD.toString(),
-    val highRank: String = Constants.HIGH_SKILL_THRESHOLD.toString()
+    val groupCount: String = "",
+    val lowRank: String = "",
+    val highRank: String = "",
+    val groupMaxPoints: String = Constants.GROUP_MAX_POINTS.toString(),
+    val playoffMaxPoints: String = Constants.PLAYOFF_MAX_POINTS.toString(),
+    val groupsResults: Map<Int, GroupResults> = mapOf(),
+    val matchOrders: Map<Int, List<Match>> = mapOf()
 )
 
 class SharedViewModel(
@@ -29,11 +37,11 @@ class SharedViewModel(
     private val coroutineScope: CoroutineScope,
     private val persistenceHandler: PersistenceHandler
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SharedUiState())
+    private val _uiState = MutableStateFlow(TournamentState())
     val uiState = _uiState.asStateFlow()
 
     fun reset() {
-        _uiState.update { SharedUiState() }
+        _uiState.update { TournamentState() }
     }
 
     fun setParticipants(participants: List<Participant>) {
@@ -90,8 +98,28 @@ class SharedViewModel(
         val midRank = mutableListOf<Participant>()
         val highRank = mutableListOf<Participant>()
 
-        val lowRankThreshold = _uiState.value.lowRank.toIntOrNull() ?: return
-        val highRankThreshold = _uiState.value.highRank.toIntOrNull() ?: return
+        val sortedParticipants = _uiState.value.participants.sortedBy { it.rank }
+
+        if (_uiState.value.lowRank.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(lowRank = sortedParticipants[sortedParticipants.size * 2 / 3].rank.toString())
+            }
+        }
+
+        if (_uiState.value.highRank.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(highRank = sortedParticipants[sortedParticipants.size / 3].rank.toString())
+            }
+        }
+
+        if (_uiState.value.groupCount.isEmpty()) {
+            _uiState.update { current ->
+                current.copy(groupCount = (sortedParticipants.size / 7 + 1).toString())
+            }
+        }
+
+        val lowRankThreshold = _uiState.value.lowRank.toInt()
+        val highRankThreshold = _uiState.value.highRank.toInt()
 
         if (lowRankThreshold < highRankThreshold) {
             // TODO drop some actual alert, no one reads logs
@@ -126,5 +154,112 @@ class SharedViewModel(
 
     fun setGroupCount(count: String) {
         _uiState.update { current -> current.copy(groupCount = count) }
+    }
+
+    fun setGroupMaxPoints(points: String) {
+        _uiState.update { current -> current.copy(groupMaxPoints = points) }
+    }
+
+    fun setPlayoffMaxPoints(points: String) {
+        _uiState.update { current -> current.copy(playoffMaxPoints = points) }
+    }
+
+    fun generateGroupOrder(matches: List<Match>, group: Int) {
+        val orderedMatches = generateGroupOrderOptimized(matches)
+        _uiState.update { current ->
+            current.copy(
+                matchOrders = current.matchOrders.toMutableMap()
+                    .apply { this[group] = orderedMatches })
+        }
+        persistenceHandler.saveTournamentState(uiState.value)
+    }
+
+    fun updateResultForGroup(groupNo: Int, pair: Match, score: Pair<String, String>) {
+        val newGroupResults = _uiState.value.groupsResults.toMutableMap()
+        val newResults = newGroupResults[groupNo]!!.results.toMutableMap()
+        newResults[pair] = score
+        newGroupResults[groupNo] = newGroupResults[groupNo]!!.copy(results = newResults)
+        _uiState.update { current -> current.copy(groupsResults = newGroupResults) }
+    }
+
+    fun updateGroupResults(groupResults: GroupResults) {
+        val newGroupResults = _uiState.value.groupsResults.toMutableMap()
+        newGroupResults[groupResults.id] = groupResults
+        _uiState.update { current -> current.copy(groupsResults = newGroupResults) }
+    }
+
+    fun setGroupsResults(groupsResults: Map<Int, GroupResults>) {
+        _uiState.update { current -> current.copy(groupsResults = groupsResults) }
+    }
+
+    fun calculateGroupStatistics() {
+        // replace all Vs by actual values
+        _uiState.update { current ->
+            current.copy(groupsResults = _uiState.value.groupsResults.map { gr ->
+                gr.key to gr.value.copy(
+                    results = gr.value.results.map {
+                        it.key to (
+                                it.value.first.replace("V", _uiState.value.groupMaxPoints) to
+                                        it.value.second.replace("V", _uiState.value.groupMaxPoints)
+                                )
+                    }.toMap()
+                )
+            }.toMap())
+        }
+
+        _uiState.value.groupsResults.values.forEach { group ->
+            evaluateGroupStatistics(group).forEach { participant ->
+                this.updateParticipant(participant)
+            }
+        }
+
+        val participantsOrdered = _uiState.value.participants.sortedWith(
+            compareByDescending<Participant> { it.groupStatistics!!.wins / it.groupStatistics.totalMatches }
+                .thenByDescending{ it.groupStatistics!!.hitsScored }
+                .thenBy { it.groupStatistics!!.hitsReceived }
+
+        )
+            .mapIndexed { index, participant ->
+                participant.copy(playOffOrder = index + 1)
+            }
+
+        this.setParticipants(participantsOrdered)
+    }
+
+    private fun evaluateGroupStatistics(group: GroupResults): List<Participant> {
+        val WINS = 0
+        val ALL = 1
+        val SCORED = 2
+        val RECEIVED = 3
+
+        val statistics = group.results.flatMap { listOf(it.key.first, it.key.second) }.distinct()
+            .associateWith { mutableListOf(0f, 0f, 0f, 0f) }
+            .toMap()
+
+        group.results.forEach { (participants, results) ->
+            val (p1, p2) = participants
+            statistics[p1]!![ALL]++
+            statistics[p1]!![SCORED] += results.first.toFloat()
+            statistics[p1]!![RECEIVED] += results.second.toFloat()
+
+            statistics[p2]!![ALL]++
+            statistics[p2]!![SCORED] += results.second.toFloat()
+            statistics[p2]!![RECEIVED] += results.first.toFloat()
+
+            when {
+                results.first == results.second -> {
+                    statistics[p1]!![WINS] += 0.5f
+                    statistics[p2]!![WINS] += 0.5f
+                }
+
+                results.first.toInt() < results.second.toInt() ->
+                    statistics[p2]!![WINS]++
+
+                else ->
+                    statistics[p1]!![WINS]++
+            }
+        }
+
+        return statistics.keys.map { it.copy(groupStatistics = GroupStatistics(statistics[it]!!)) }
     }
 }
