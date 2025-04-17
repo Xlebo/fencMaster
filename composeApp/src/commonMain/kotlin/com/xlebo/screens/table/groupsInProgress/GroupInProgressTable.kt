@@ -2,6 +2,7 @@ package com.xlebo.screens.table.groupsInProgress
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.LocalTextStyle
@@ -26,9 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.xlebo.model.Participant
 import com.xlebo.utils.defaultButton
 import com.xlebo.utils.tournamentDetailTableCell
@@ -99,12 +104,6 @@ fun GroupInProgressTable(
                         modifier = Modifier.tournamentDetailTableCell().width(120.dp),
                         maxLines = 1
                     )
-
-//            Text(
-//                p.club ?: "",
-//                modifier = Modifier.tournamentDetailTableCell().width(100.dp),
-//                maxLines = 1
-//            )
 
                     // table data
                     participants.forEachIndexed { iSecond, p2 ->
@@ -183,25 +182,47 @@ fun GroupInProgressTable(
 
         Spacer(Modifier.width(20.dp))
 
-        Column {
-            Spacer(modifier = Modifier.height(120.dp))
-            matchesOrder.filterIndexed { index, _ -> index <= matchesOrder.size / 2 }.forEach {
-                Text(
-                    "${it.first.lastName} ${it.first.firstName.first()}. - " +
-                            "${it.second.lastName} ${it.second.firstName.first()}."
-                )
+        SelectionContainer {
+            Column {
+                Spacer(modifier = Modifier.height(120.dp))
+                matchesOrder.filterIndexed { index, _ -> index <= matchesOrder.size / 2 }.forEach {
+                    Text(
+                        modifier = Modifier.focusable(true),
+                        style = TextStyle(
+                            textDecoration = if (groupResults.results[it.first to it.second]!!.first.isNotBlank() &&
+                                groupResults.results[it.first to it.second]!!.second.isNotBlank()
+                            ) TextDecoration.LineThrough
+                            else null
+                        ),
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        text = "${it.first.lastName} ${it.first.firstName.first()}. - " +
+                                "${it.second.lastName} ${it.second.firstName.first()}.\n"
+                    )
+                }
             }
         }
 
         Spacer(Modifier.width(20.dp))
 
-        Column {
-            Spacer(modifier = Modifier.height(120.dp))
-            matchesOrder.filterIndexed { index, _ -> index > matchesOrder.size / 2 }.forEach {
-                Text(
-                    "${it.first.lastName} ${it.first.firstName.first()}. - " +
-                            "${it.second.lastName} ${it.second.firstName.first()}."
-                )
+        SelectionContainer {
+            Column {
+                Spacer(modifier = Modifier.height(120.dp))
+                matchesOrder.filterIndexed { index, _ -> index > matchesOrder.size / 2 }.forEach {
+                    Text(
+                        modifier = Modifier.focusable(true),
+                        style = TextStyle(
+                            textDecoration = if (groupResults.results[it.first to it.second]!!.first.isNotBlank() &&
+                                groupResults.results[it.first to it.second]!!.second.isNotBlank()
+                            ) TextDecoration.LineThrough
+                            else null
+                        ),
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        text = "${it.first.lastName} ${it.first.firstName.first()}. - " +
+                                "${it.second.lastName} ${it.second.firstName.first()}.\n"
+                    )
+                }
             }
         }
     }
