@@ -80,6 +80,7 @@ kotlin {
 //            implementation(compose.desktop.linux_x64)
             runtimeOnly(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.easytable)
         }
     }
 }

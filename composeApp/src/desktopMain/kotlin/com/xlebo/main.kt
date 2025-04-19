@@ -34,7 +34,8 @@ fun main() = application {
                     lazyListState
                 )
             },
-            persistenceHandler = TournamentLoader()
+            persistenceHandler = TournamentLoader(),
+            pdfExportHandler = PdfGenerator()
         )
     }
 }

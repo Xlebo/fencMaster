@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.utils.defaultButton
 import com.xlebo.viewModel.PersistenceHandler
 import com.xlebo.viewModel.SharedViewModel
@@ -68,13 +68,13 @@ fun HomeScreen(
                             viewModel.loadTournamentState(tournament)
                             navController.navigate(
                                 when (viewModel.uiState.value.tournamentState) {
-                                    TournamentState.NEW -> {
+                                    TournamentStatus.NEW -> {
                                         Napier.w { "Trying to navigate to NEW state tournament: $tournament" }
                                         Screen.CreateTournament
                                     }
-                                    TournamentState.GROUPS_PREVIEW -> Screen.GroupsPreview
-                                    TournamentState.GROUPS_STARTED -> Screen.GroupsInProgress
-                                    TournamentState.PLAYOFF -> Screen.PlayOffPreview
+                                    TournamentStatus.GROUPS_PREVIEW -> Screen.GroupsPreview
+                                    TournamentStatus.GROUPS_STARTED -> Screen.GroupsInProgress
+                                    TournamentStatus.PLAYOFF -> Screen.PlayOffPreview
                                 }
                             )
                         },

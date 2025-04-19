@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.xlebo.model.GroupResults
 import com.xlebo.model.GroupStatistics
 import com.xlebo.model.Participant
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.networking.HemaRatingClient
 import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.utils.Constants
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TournamentState(
-    val tournamentState: TournamentState = TournamentState.NEW,
+    val tournamentState: TournamentStatus = TournamentStatus.NEW,
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
     val category: String = "1",
@@ -35,7 +35,8 @@ data class TournamentState(
 class SharedViewModel(
     private val hemaRating: HemaRatingClient,
     private val coroutineScope: CoroutineScope,
-    private val persistenceHandler: PersistenceHandler
+    private val persistenceHandler: PersistenceHandler,
+    private val pdfExportHandler: PdfExportHandler
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TournamentState())
     val uiState = _uiState.asStateFlow()
@@ -56,7 +57,7 @@ class SharedViewModel(
     }
 
     fun setName(name: String) {
-        check(_uiState.value.tournamentState == TournamentState.NEW)
+        check(_uiState.value.tournamentState == TournamentStatus.NEW)
         _uiState.update { current -> current.copy(name = name) }
     }
 
@@ -81,9 +82,9 @@ class SharedViewModel(
         _uiState.update { current -> current.copy(category = category) }
     }
 
-    fun saveData(tournamentState: TournamentState = _uiState.value.tournamentState) {
-        if (_uiState.value.tournamentState != tournamentState)
-            _uiState.update { current -> current.copy(tournamentState = tournamentState) }
+    fun saveData(tournamentStatus: TournamentStatus = _uiState.value.tournamentState) {
+        if (_uiState.value.tournamentState != tournamentStatus)
+            _uiState.update { current -> current.copy(tournamentState = tournamentStatus) }
         persistenceHandler.saveTournamentState(_uiState.value)
     }
 
@@ -261,5 +262,9 @@ class SharedViewModel(
         }
 
         return statistics.keys.map { it.copy(groupStatistics = GroupStatistics(statistics[it]!!)) }
+    }
+
+    fun exportGroupsPdf() {
+        pdfExportHandler.createGroupsPdf(_uiState.value)
     }
 }

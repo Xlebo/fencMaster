@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.screens.dialog.AlertDialog
 import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.groupsInProgress.GroupInProgressTable
@@ -52,7 +52,7 @@ fun GroupsInProgressScreen(
     if (submitDialog) {
         SubmitDialog(onBackRequest = { submitDialog = false }, onContinueRequest = {
             viewModel.calculateGroupStatistics()
-            viewModel.saveData(TournamentState.PLAYOFF)
+            viewModel.saveData(TournamentStatus.PLAYOFF)
             navController.navigate(Screen.PlayOffPreview )
         })
     }
@@ -84,6 +84,12 @@ fun GroupsInProgressScreen(
                         text = "${uiState.name} Groups In Progress",
                         fontSize = 24.sp
                     )
+                    Button(
+                        modifier = Modifier.defaultButton().align(Alignment.CenterEnd),
+                        onClick = {
+                            viewModel.exportGroupsPdf()
+                        }
+                    ) { Text("Export")}
                 }
                 Spacer(Modifier)
             }
