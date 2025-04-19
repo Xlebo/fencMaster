@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.xlebo.model.GroupResults
 import com.xlebo.model.Participant
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.groupsPreview.GroupTableRow
 import com.xlebo.utils.backButton
@@ -79,7 +79,7 @@ fun GroupsPreviewScreen(
                 }.toMap()
             )
 
-            viewModel.saveData(TournamentState.GROUPS_STARTED)
+            viewModel.saveData(TournamentStatus.GROUPS_STARTED)
             navController.navigate(Screen.GroupsInProgress)
         })
     }
@@ -102,6 +102,7 @@ fun GroupsPreviewScreen(
                             viewModel.reset()
                         }) { Text("Home") }
                     Text(
+                        modifier = Modifier.align(Alignment.Center),
                         text = "${uiState.name} Groups Preview",
                         fontSize = 24.sp
                     )
