@@ -8,7 +8,7 @@ import com.xlebo.model.TournamentStatus
 import com.xlebo.networking.HemaRatingClient
 import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.utils.Constants
-import com.xlebo.utils.generateGroupOrderOptimized
+import com.xlebo.utils.createPairings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -165,13 +165,16 @@ class SharedViewModel(
         _uiState.update { current -> current.copy(playoffMaxPoints = points) }
     }
 
-    fun generateGroupOrder(matches: List<Match>, group: Int) {
-        val orderedMatches = generateGroupOrderOptimized(matches)
-        _uiState.update { current ->
-            current.copy(
-                matchOrders = current.matchOrders.toMutableMap()
-                    .apply { this[group] = orderedMatches })
+    fun generateMatchOrders() {
+        val newOrders: MutableMap<Int, List<Match>> = mutableMapOf()
+        _uiState.value.groupsResults.keys.forEach { group ->
+            val orderedMatches = createPairings(
+                _uiState.value.participants
+                    .filter { it.group == group }
+                    .sortedBy { it.order })
+            newOrders[group] = orderedMatches
         }
+        _uiState.update { current -> current.copy(matchOrders = newOrders) }
         persistenceHandler.saveTournamentState(uiState.value)
     }
 
@@ -216,7 +219,7 @@ class SharedViewModel(
 
         val participantsOrdered = _uiState.value.participants.sortedWith(
             compareByDescending<Participant> { it.groupStatistics!!.wins / it.groupStatistics.totalMatches }
-                .thenByDescending{ it.groupStatistics!!.hitsScored }
+                .thenByDescending { it.groupStatistics!!.hitsScored }
                 .thenBy { it.groupStatistics!!.hitsReceived }
 
         )

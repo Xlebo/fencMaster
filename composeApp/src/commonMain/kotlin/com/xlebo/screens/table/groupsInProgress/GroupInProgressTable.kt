@@ -49,9 +49,6 @@ fun GroupInProgressTable(
 
     val groupResults = uiState.groupsResults[groupNo]!!
     val isLocked = mutableStateOf(groupResults.locked)
-
-    if (!viewModel.uiState.value.matchOrders.containsKey(groupNo))
-        viewModel.generateGroupOrder(groupResults.results.keys.toList(), groupNo)
     val matchesOrder = viewModel.uiState.value.matchOrders[groupNo]!!
 
     Row {
