@@ -1,6 +1,7 @@
 package com.xlebo
 
 import com.xlebo.model.Participant
+import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.viewModel.PdfExportHandler
 import com.xlebo.viewModel.TournamentState
 import org.apache.pdfbox.pdmodel.PDDocument
@@ -28,17 +29,20 @@ class PdfGenerator : PdfExportHandler {
     override fun createGroupsPdf(tournamentState: TournamentState) {
         val folder = tournamentState.name.replace(" ", "_")
         PDDocument().use { document ->
-            tournamentState.participants.groupBy { it.group }.forEach { (number, participants) ->
-                val page = PDPage(PDRectangle.A4)
-                document.addPage(page)
-                addGroupPage(
-                    number!!,
-                    participants.sortedBy { it.order },
-//                    tournamentState.matchOrders[number]!!,
-                    document,
-                    page
-                )
-            }
+            tournamentState.participants.groupBy { it.group }
+                .map { it.key to it.value }
+                .sortedBy { it.first }
+                .forEach { (number, participants) ->
+                    val page = PDPage(PDRectangle.A4)
+                    document.addPage(page)
+                    addGroupPage(
+                        number!!,
+                        participants.sortedBy { it.order },
+                        tournamentState.matchOrders[number]!!,
+                        document,
+                        page
+                    )
+                }
             document.save(File("$workingDirectory/$folder/${folder}_Groups.pdf"))
         }
 
@@ -47,11 +51,20 @@ class PdfGenerator : PdfExportHandler {
     private fun addGroupPage(
         groupNumber: Int,
         participants: List<Participant>,
-//        order: List<Match>,
+        order: List<Match>,
         document: PDDocument,
         page: PDPage
     ) {
         PDPageContentStream(document, page).use { contentStream ->
+            contentStream.beginText()
+            contentStream.newLineAtOffset(PADDING, page.mediaBox.height - PADDING - 24)
+            contentStream.setFont(
+                PDType0Font.load(document, File("c:/windows/fonts/arial.ttf")),
+                24f
+            )
+            contentStream.showText("Group $groupNumber")
+            contentStream.endText()
+
             TableDrawer.builder()
                 .page(page)
                 .contentStream(contentStream)
@@ -61,13 +74,31 @@ class PdfGenerator : PdfExportHandler {
                 .endY(PADDING)
                 .build()
                 .draw({ document }, { PDPage(PDRectangle.A4) }, PADDING)
+
+            var tableHeight = PADDING + 90 + 30 * participants.size + 30
+            order.forEach {
+                contentStream.beginText()
+                contentStream.setFont(
+                    PDType0Font.load(document, File("c:/windows/fonts/arial.ttf")),
+                    12f
+                )
+                contentStream.newLineAtOffset(PADDING, page.mediaBox.height - tableHeight)
+                contentStream.showText(
+                    "${it.first.lastName} ${it.first.firstName.first()}. - " +
+                            "${it.second.lastName} ${it.second.firstName.first()}."
+                )
+                tableHeight += 20
+                contentStream.endText()
+            }
+
         }
     }
 
     private fun createTable(participants: List<Participant>, document: PDDocument): Table {
         val tableBuilder = Table.builder()
-            .addColumnsOfWidth(40f, 75f, 90f)
-            .addColumnsOfWidth(*(FloatArray(participants.size) { 50f }))
+            .addColumnsOfWidth(75f, 90f)
+            .addColumnsOfWidth(*(FloatArray(participants.size) { 45f }))
+            .addColumnsOfWidth(80f)
             .padding(2f)
             //FIXME: The time bomb
             //https://issues.apache.org/jira/browse/PDFBOX-3504
@@ -77,19 +108,18 @@ class PdfGenerator : PdfExportHandler {
         val header = Row.builder().height(90f)
             .add(createEmptySpacingCell())
             .add(createEmptySpacingCell())
-            .add(createEmptySpacingCell())
         participants.forEach { participant ->
             header.add(createRotatedHeaderCell(participant.lastName))
         }
+        header.add(createEmptySpacingCell())
         tableBuilder.addRow(header.build())
 
         participants.forEach { participant ->
             val row = Row.builder().height(30f)
-                .add(createTextCell(participant.lang ?: ""))
                 .add(createTextCell(participant.firstName))
                 .add(createTextCell(participant.lastName))
-
             participants.forEach { _ -> row.add(createEmptyCell()) }
+            row.add(createEmptyCell())
             tableBuilder.addRow(row.build())
         }
 

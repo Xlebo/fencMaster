@@ -78,6 +78,7 @@ fun GroupsPreviewScreen(
                     group.key!! to GroupResults(group.key!!, results, false)
                 }.toMap()
             )
+            viewModel.generateMatchOrders()
 
             viewModel.saveData(TournamentStatus.GROUPS_STARTED)
             navController.navigate(Screen.GroupsInProgress)
