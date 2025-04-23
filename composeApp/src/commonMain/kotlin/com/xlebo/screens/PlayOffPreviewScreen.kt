@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -16,7 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,9 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.screens.table.participantsPreview.NewParticipantTableRow
-import com.xlebo.screens.table.participantsPreview.ParticipantTableRow
-import com.xlebo.screens.table.participantsPreview.TableHeader
 import com.xlebo.utils.backButton
 import com.xlebo.utils.defaultButton
 import com.xlebo.utils.groupPreviewTableCell
@@ -50,6 +48,7 @@ fun PlayOffPreviewScreen(
     val scrollState = rememberLazyListState()
     val viewModel: SharedViewModel = koinViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    var playersCount: Int? by remember { mutableStateOf(uiState.participants.size) }
 
     Box(Modifier.fillMaxSize()) {
         LazyColumn(
@@ -57,21 +56,48 @@ fun PlayOffPreviewScreen(
             contentPadding = PaddingValues(15.dp)
         ) {
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Button(
-                        modifier = Modifier.backButton().align(Alignment.CenterStart),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
-                        onClick = {
-                            navController.navigate(Screen.Home)
-                            viewModel.saveData()
-                            viewModel.reset()
-                        }) { Text("Home") }
+                    Box(
+                        modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd
+                    ) {
+                        Button(
+                            modifier = Modifier.backButton().align(Alignment.CenterStart),
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red),
+                            onClick = {
+                                navController.navigate(Screen.Home)
+                                viewModel.saveData()
+                                viewModel.reset()
+                            }) { Text("Home") }
+                        Text(
+                            modifier = Modifier.align(Alignment.Center),
+                            text = "${uiState.name} PlayOff Preview",
+                            fontSize = 24.sp
+                        )
+                        Button(
+                            modifier = Modifier.defaultButton().align(Alignment.CenterEnd),
+                            onClick = {
+                                viewModel.exportPlayOffGraphPdf(
+                                    playersCount ?: uiState.participants.size
+                                )
+                            }
+                        ) { Text("Export") }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
                     Text(
-                        modifier = Modifier.align(Alignment.Center),
-                        text = "${uiState.name} PlayOff Preview",
-                        fontSize = 24.sp
+                        text = "Počet postupujúcich:"
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.width(50.dp),
+                        value = playersCount?.toString() ?: "",
+                        onValueChange = {
+                            playersCount = it.toIntOrNull()
+                        }
                     )
                 }
                 Spacer(Modifier)
