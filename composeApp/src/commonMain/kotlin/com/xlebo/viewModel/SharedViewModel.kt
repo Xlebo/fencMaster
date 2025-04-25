@@ -272,11 +272,20 @@ class SharedViewModel(
     }
 
     fun exportPlayOffGraphPdf(players: Int) {
-        pdfExportHandler.createPlayOff(
+        pdfExportHandler.createPlayOffGraph(
             _uiState.value.name,
             _uiState.value.participants
                 .sortedBy { it.playOffOrder }
                 .subList(0, players),
+            _uiState.value.name.replace(" ", "_")
+        )
+    }
+
+    fun exportPlayOffOrderPdf() {
+        pdfExportHandler.createPlayOffOrder(
+            _uiState.value.name,
+            _uiState.value.participants
+                .sortedBy { it.playOffOrder },
             _uiState.value.name.replace(" ", "_")
         )
     }

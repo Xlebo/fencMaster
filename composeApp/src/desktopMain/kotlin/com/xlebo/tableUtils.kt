@@ -5,8 +5,12 @@ import org.vandeseer.easytable.settings.VerticalAlignment
 import org.vandeseer.easytable.structure.cell.AbstractCell
 import org.vandeseer.easytable.structure.cell.TextCell
 import org.vandeseer.easytable.structure.cell.VerticalTextCell
+import java.awt.Color
 
-fun createEmptySpacingCell(): AbstractCell = TextCell.builder().minHeight(50f).text("").build()
+fun createEmptySpacingCell(): AbstractCell =
+    TextCell.builder().minHeight(50f).text("").backgroundColor(
+        Color.WHITE
+    ).build()
 
 fun createEmptyCell(): AbstractCell = TextCell.builder().text("").borderWidth(1f).build()
 

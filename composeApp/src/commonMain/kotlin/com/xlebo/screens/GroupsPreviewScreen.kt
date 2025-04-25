@@ -79,8 +79,8 @@ fun GroupsPreviewScreen(
                 }.toMap()
             )
             viewModel.generateMatchOrders()
-
             viewModel.saveData(TournamentStatus.GROUPS_STARTED)
+            viewModel.exportGroupsPdf()
             navController.navigate(Screen.GroupsInProgress)
         })
     }

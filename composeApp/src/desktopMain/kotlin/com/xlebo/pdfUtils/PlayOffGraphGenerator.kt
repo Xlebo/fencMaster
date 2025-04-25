@@ -12,7 +12,7 @@ import kotlin.math.log2
 import kotlin.math.min
 import kotlin.math.pow
 
-object PlayOffGenerator {
+object PlayOffGraphGenerator {
     private val pageWidth = PDRectangle.A4.height // Swapped height and width for landscape
     private val pageHeight = PDRectangle.A4.width
     private val margin = 20f
@@ -56,7 +56,8 @@ object PlayOffGenerator {
         val firstRoundSlots = previousPowerOfTwo
 
         // Create the seeded arrangement with or without preliminary rounds
-        val bracket = createBracketWithPreliminaryRounds(sortedParticipants, preliminaryMatchesCount)
+        val bracket =
+            createBracketWithPreliminaryRounds(sortedParticipants, preliminaryMatchesCount)
 
         // Calculate how many pages we need
         val firstRoundMatches = firstRoundSlots / 2
@@ -71,11 +72,15 @@ object PlayOffGenerator {
                 document.addPage(page)
 
                 PDPageContentStream(document, page).use { contentStream ->
+                    val text = "$name PlayOff - Page ${pageIndex + 1} of $totalPages"
                     // Draw the title
                     contentStream.beginText()
                     contentStream.setFont(font, 16f)
-                    contentStream.newLineAtOffset(600f, pageHeight - margin)
-                    contentStream.showText("$name PlayOff - Page ${pageIndex + 1} of $totalPages")
+                    contentStream.newLineAtOffset(
+                        PDRectangle.A4.height - font.getStringWidth(text) / 1000.0f * 16 - margin,
+                        pageHeight - margin
+                    )
+                    contentStream.showText(text)
                     contentStream.endText()
 
                     // Calculate which matches go on this page
@@ -132,8 +137,9 @@ object PlayOffGenerator {
             // These participants will compete for the remaining spots in the main bracket
             var prelimParticipantIndex = directQualifierCount
 
-            for (i in 1 .. preliminaryMatchesCount) {
-                val mainBracketPos = seedIndices.indexOf(mainBracketSize - preliminaryMatchesCount + i - 1)
+            for (i in 1..preliminaryMatchesCount) {
+                val mainBracketPos =
+                    seedIndices.indexOf(mainBracketSize - preliminaryMatchesCount + i - 1)
 
                 // Create preliminary match between two participants
                 val participant1 = if (prelimParticipantIndex < participantCount)
@@ -214,8 +220,8 @@ object PlayOffGenerator {
                 val bottomPos = matchPos * 2 + 1
 
                 val yPos = pageHeight - margin - (i + 0.5f) * verticalSpacing
-                val yTop = yPos + verticalSpacing/4
-                val yBottom = yPos - verticalSpacing/4
+                val yTop = yPos + verticalSpacing / 4
+                val yBottom = yPos - verticalSpacing / 4
 
                 // If either position has a preliminary match, draw it
                 if (bracket.hasPreliminaryMatch(topPos)) {
@@ -259,8 +265,8 @@ object PlayOffGenerator {
                     val bottomPos = (startMatchIndex + i) * 2 + 1
 
                     // Draw participant names and lines
-                    val yTop = yPos + matchSpacingForRound/4
-                    val yBottom = yPos - matchSpacingForRound/4
+                    val yTop = yPos + matchSpacingForRound / 4
+                    val yBottom = yPos - matchSpacingForRound / 4
 
                     // Top participant
                     val topParticipant = bracket.getParticipant(topPos)
@@ -290,8 +296,8 @@ object PlayOffGenerator {
                 } else {
                     // For subsequent rounds
                     val nextRoundY = yPos - 3
-                    val prevRoundTopY = yPos - matchSpacingForRound/4 - 3
-                    val prevRoundBottomY = yPos + matchSpacingForRound/4 - 3
+                    val prevRoundTopY = yPos - matchSpacingForRound / 4 - 3
+                    val prevRoundBottomY = yPos + matchSpacingForRound / 4 - 3
 
                     // Draw connector for this round
                     drawConnector(

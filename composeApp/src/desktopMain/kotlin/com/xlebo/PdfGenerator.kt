@@ -2,7 +2,8 @@ package com.xlebo
 
 import com.xlebo.model.Participant
 import com.xlebo.pdfUtils.GroupsGenerator
-import com.xlebo.pdfUtils.PlayOffGenerator
+import com.xlebo.pdfUtils.PlayOffGraphGenerator
+import com.xlebo.pdfUtils.PlayOffOrderGenerator
 import com.xlebo.viewModel.PdfExportHandler
 import com.xlebo.viewModel.TournamentState
 import kotlin.io.path.Path
@@ -24,8 +25,12 @@ class PdfGenerator : PdfExportHandler {
         GroupsGenerator.createGroupsPdf(tournamentState, "$workingDirectory/$folder/${folder}_Groups.pdf")
     }
 
-    override fun createPlayOff(name: String, participants: List<Participant>, folder: String) {
-        PlayOffGenerator.generatePlayoffBracket(name, participants, "$workingDirectory/$folder/${folder}_PlayOff.pdf")
+    override fun createPlayOffGraph(name: String, participants: List<Participant>, folder: String) {
+        PlayOffGraphGenerator.generatePlayoffBracket(name, participants, "$workingDirectory/$folder/${folder}_PlayOff.pdf")
+    }
+
+    override fun createPlayOffOrder(name: String, participants: List<Participant>, folder: String) {
+        PlayOffOrderGenerator.createPlayOffOrderPdf(name, participants, "$workingDirectory/$folder/${folder}_PlayOffOrder.pdf")
     }
 
 }
