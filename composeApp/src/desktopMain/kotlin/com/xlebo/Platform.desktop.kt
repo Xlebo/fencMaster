@@ -4,13 +4,13 @@ import androidx.compose.ui.awt.ComposeWindow
 import com.xlebo.model.Participant
 import io.github.aakira.napier.Napier
 import net.codinux.csv.reader.CsvReader
+import net.codinux.csv.reader.CsvRow
 import net.codinux.csv.reader.read
 import java.awt.FileDialog
 import java.io.File
 
 class JVMPlatform : Platform {
     override val name: String = "Java ${System.getProperty("java.version")}"
-    private val tournamentLoader = TournamentLoader()
 
     override fun handleFileSelection(): String? {
         val dialog = FileDialog(ComposeWindow())
@@ -32,6 +32,7 @@ class JVMPlatform : Platform {
             return listOf()
         }
         val csv = File(file)
+        CsvRow
         val headers = Participant.getHeaders()
         return CsvReader(hasHeaderRow = true)
             .read(csv)
@@ -44,7 +45,7 @@ class JVMPlatform : Platform {
                     row[headers[4]].trim(),
                     row[headers[5]].trim(),
                     row[headers[6]].shortLang(),
-                    null
+                    row["Rank"].toIntOrNull()
                 )
             }
     }
