@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.screens.dialog.SubmitDialog
 import com.xlebo.screens.table.participantsPreview.TableHeader
 import com.xlebo.screens.table.participantsPreview.NewParticipantTableRow
@@ -62,7 +62,7 @@ fun TournamentDetailScreen(
                     .filter { !it.disabled }
                     .map { if (it.rank == null) it.copy(rank = 99999) else it })
                 viewModel.generateGroups()
-                viewModel.saveData(TournamentState.GROUPS_PREVIEW)
+                viewModel.saveData(TournamentStatus.GROUPS_PREVIEW)
                 navController.navigate(Screen.GroupsPreview)
             }
         )

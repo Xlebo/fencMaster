@@ -80,6 +80,7 @@ kotlin {
 //            implementation(compose.desktop.linux_x64)
             runtimeOnly(libs.kotlinx.coroutines.swing)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.easytable)
         }
     }
 }
@@ -121,7 +122,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb, TargetFormat.Exe)
             packageName = "fencmaster"
-            packageVersion = "1.5.0"
+            packageVersion = "1.8.0"
             windows {
                 iconFile.set(project.file("mec.ico"))
                 shortcut = true

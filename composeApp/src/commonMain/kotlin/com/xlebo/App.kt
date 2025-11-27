@@ -19,6 +19,7 @@ import com.xlebo.screens.HomeScreen
 import com.xlebo.screens.PlayOffPreviewScreen
 import com.xlebo.screens.Screen
 import com.xlebo.screens.TournamentDetailScreen
+import com.xlebo.viewModel.PdfExportHandler
 import com.xlebo.viewModel.PersistenceHandler
 import com.xlebo.viewModel.SharedViewModel
 import io.github.aakira.napier.Napier
@@ -30,6 +31,7 @@ import org.koin.dsl.module
 fun App(
     hemaRatingClient: HemaRatingClient,
     persistenceHandler: PersistenceHandler,
+    pdfExportHandler: PdfExportHandler,
     lazyListScrollBar: (@Composable (Modifier, LazyListState) -> Unit)? = null
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -40,7 +42,7 @@ fun App(
         application = {
             modules(
                 module {
-                    single { SharedViewModel(hemaRatingClient, coroutineScope, persistenceHandler) }
+                    single { SharedViewModel(hemaRatingClient, coroutineScope, persistenceHandler, pdfExportHandler) }
                 }
             )
         }

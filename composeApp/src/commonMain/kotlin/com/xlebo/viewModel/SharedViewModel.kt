@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.xlebo.model.GroupResults
 import com.xlebo.model.GroupStatistics
 import com.xlebo.model.Participant
-import com.xlebo.model.TournamentState
+import com.xlebo.model.TournamentStatus
 import com.xlebo.networking.HemaRatingClient
 import com.xlebo.screens.table.groupsInProgress.Match
 import com.xlebo.utils.Constants
-import com.xlebo.utils.generateGroupOrderOptimized
+import com.xlebo.utils.createPairings
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TournamentState(
-    val tournamentState: TournamentState = TournamentState.NEW,
+    val tournamentState: TournamentStatus = TournamentStatus.NEW,
     val name: String = "Nový turnaj",
     val participants: List<Participant> = listOf(),
     val category: String = "1",
@@ -35,7 +35,8 @@ data class TournamentState(
 class SharedViewModel(
     private val hemaRating: HemaRatingClient,
     private val coroutineScope: CoroutineScope,
-    private val persistenceHandler: PersistenceHandler
+    private val persistenceHandler: PersistenceHandler,
+    private val pdfExportHandler: PdfExportHandler
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TournamentState())
     val uiState = _uiState.asStateFlow()
@@ -56,7 +57,7 @@ class SharedViewModel(
     }
 
     fun setName(name: String) {
-        check(_uiState.value.tournamentState == TournamentState.NEW)
+        check(_uiState.value.tournamentState == TournamentStatus.NEW)
         _uiState.update { current -> current.copy(name = name) }
     }
 
@@ -81,9 +82,9 @@ class SharedViewModel(
         _uiState.update { current -> current.copy(category = category) }
     }
 
-    fun saveData(tournamentState: TournamentState = _uiState.value.tournamentState) {
-        if (_uiState.value.tournamentState != tournamentState)
-            _uiState.update { current -> current.copy(tournamentState = tournamentState) }
+    fun saveData(tournamentStatus: TournamentStatus = _uiState.value.tournamentState) {
+        if (_uiState.value.tournamentState != tournamentStatus)
+            _uiState.update { current -> current.copy(tournamentState = tournamentStatus) }
         persistenceHandler.saveTournamentState(_uiState.value)
     }
 
@@ -164,13 +165,16 @@ class SharedViewModel(
         _uiState.update { current -> current.copy(playoffMaxPoints = points) }
     }
 
-    fun generateGroupOrder(matches: List<Match>, group: Int) {
-        val orderedMatches = generateGroupOrderOptimized(matches)
-        _uiState.update { current ->
-            current.copy(
-                matchOrders = current.matchOrders.toMutableMap()
-                    .apply { this[group] = orderedMatches })
+    fun generateMatchOrders() {
+        val newOrders: MutableMap<Int, List<Match>> = mutableMapOf()
+        _uiState.value.groupsResults.keys.forEach { group ->
+            val orderedMatches = createPairings(
+                _uiState.value.participants
+                    .filter { it.group == group }
+                    .sortedBy { it.order })
+            newOrders[group] = orderedMatches
         }
+        _uiState.update { current -> current.copy(matchOrders = newOrders) }
         persistenceHandler.saveTournamentState(uiState.value)
     }
 
@@ -215,7 +219,7 @@ class SharedViewModel(
 
         val participantsOrdered = _uiState.value.participants.sortedWith(
             compareByDescending<Participant> { it.groupStatistics!!.wins / it.groupStatistics.totalMatches }
-                .thenByDescending{ it.groupStatistics!!.hitsScored }
+                .thenByDescending { it.groupStatistics!!.hitsScored }
                 .thenBy { it.groupStatistics!!.hitsReceived }
 
         )
@@ -261,5 +265,28 @@ class SharedViewModel(
         }
 
         return statistics.keys.map { it.copy(groupStatistics = GroupStatistics(statistics[it]!!)) }
+    }
+
+    fun exportGroupsPdf() {
+        pdfExportHandler.createGroupsPdf(_uiState.value)
+    }
+
+    fun exportPlayOffGraphPdf(players: Int) {
+        pdfExportHandler.createPlayOffGraph(
+            _uiState.value.name,
+            _uiState.value.participants
+                .sortedBy { it.playOffOrder }
+                .subList(0, players),
+            _uiState.value.name.replace(" ", "_")
+        )
+    }
+
+    fun exportPlayOffOrderPdf() {
+        pdfExportHandler.createPlayOffOrder(
+            _uiState.value.name,
+            _uiState.value.participants
+                .sortedBy { it.playOffOrder },
+            _uiState.value.name.replace(" ", "_")
+        )
     }
 }
